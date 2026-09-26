@@ -1,0 +1,82 @@
+name: Collect T1 StatsAPI snapshot
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Optional operating date (YYYY-MM-DD). Leave blank for current Europe/London date."
+        required: false
+        type: string
+  schedule:
+    # Dual UTC schedules + London-time guard handle BST/GMT automatically.
+    # The real collection runs at about 21:40 Europe/London, ahead of T1 at 22:47.
+    - cron: "40 20 * * *"
+    - cron: "40 21 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: t1-statsapi-snapshot
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: London-time schedule guard
+        id: guard
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          const event = process.env.GITHUB_EVENT_NAME;
+          let run = true;
+
+          if (event === "schedule") {
+            const hour = new Intl.DateTimeFormat("en-GB", {
+              timeZone: "Europe/London",
+              hour: "2-digit",
+              hour12: false
+            }).format(new Date());
+
+            run = hour === "21";
+          }
+
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `run=${run}\n`);
+          console.log(`event=${event} run=${run}`);
+          NODE
+
+      - name: Collect StatsAPI snapshot
+        if: steps.guard.outputs.run == 'true'
+        env:
+          STATS_API_KEY: ${{ secrets.STATS_API_KEY }}
+          TARGET_DATE: ${{ github.event.inputs.date || '' }}
+          MAX_CONCURRENCY: "4"
+          RECENT_MATCHES: "5"
+          STATS_PER_TEAM: "3"
+        run: node collector.mjs
+
+      - name: Commit secret-free snapshots
+        if: steps.guard.outputs.run == 'true'
+        shell: bash
+        run: |
+          git config user.name "T1 StatsAPI Collector"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No snapshot changes to commit."
+            exit 0
+          fi
+          git commit -m "Update T1 StatsAPI snapshot"
+          git push
