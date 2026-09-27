@@ -1,4 +1,4 @@
-name: Collect T1 StatsAPI snapshot
+name: Collect T5 Football StatsAPI snapshot
 
 on:
   workflow_dispatch:
@@ -9,14 +9,18 @@ on:
         type: string
 
   schedule:
-    - cron: "40 20 * * *"
-    - cron: "40 21 * * *"
+    # 03:00 Europe/London.
+    # Two UTC schedules handle GMT/BST; the London guard below
+    # ensures only the correct one actually performs collection.
+    - cron: "0 2 * * *"
+    - cron: "0 3 * * *"
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
-  group: t1-statsapi-snapshot
+  group: t5-football-statsapi
   cancel-in-progress: false
 
 jobs:
@@ -27,6 +31,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -49,30 +55,105 @@ jobs:
               hour12: false
             }).format(new Date());
 
-            run = hour === "21";
+            run = hour === "03";
           }
 
-          fs.appendFileSync(process.env.GITHUB_OUTPUT, `run=${run}\n`);
+          fs.appendFileSync(
+            process.env.GITHUB_OUTPUT,
+            `run=${run}\n`
+          );
+
           console.log(`event=${event} run=${run}`);
           NODE
 
-      - name: Collect StatsAPI snapshot
+      - name: Collect football data
         if: steps.guard.outputs.run == 'true'
         env:
           STATS_API_KEY: ${{ secrets.STATS_API_KEY }}
           TARGET_DATE: ${{ github.event.inputs.date || '' }}
+          PASS_BUDGET_MS: "1320000"
         run: node collector.mjs
 
-      - name: Commit secret-free snapshots
+      - name: Read collection state
+        if: steps.guard.outputs.run == 'true'
+        id: state
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+
+          const latest = JSON.parse(
+            fs.readFileSync("data/latest.json", "utf8")
+          );
+
+          const state =
+            latest.state || "UNKNOWN";
+
+          fs.appendFileSync(
+            process.env.GITHUB_OUTPUT,
+            `state=${state}\n`
+          );
+
+          fs.appendFileSync(
+            process.env.GITHUB_OUTPUT,
+            `date=${latest.base_operating_date}\n`
+          );
+
+          console.log(`Collection state: ${state}`);
+          console.log(
+            `Operating date: ${latest.base_operating_date}`
+          );
+          NODE
+
+      - name: Commit checkpoint or completed snapshot
         if: steps.guard.outputs.run == 'true'
         shell: bash
         run: |
-          git config user.name "T1 StatsAPI Collector"
+          git config user.name "T5 Football Collector"
           git config user.email "actions@users.noreply.github.com"
+
           git add data/
+
           if git diff --cached --quiet; then
-            echo "No snapshot changes to commit."
+            echo "No data changes to commit."
             exit 0
           fi
-          git commit -m "Update T1 StatsAPI snapshot"
-          git push
+
+          git commit -m "Update T5 football collection state"
+
+          for attempt in 1 2 3; do
+            if git push; then
+              exit 0
+            fi
+
+            echo "Push attempt ${attempt} failed; rebasing and retrying."
+            git pull --rebase origin main
+            sleep 2
+          done
+
+          echo "Unable to persist collection checkpoint."
+          exit 1
+
+      - name: Start continuation pass
+        if: >
+          steps.guard.outputs.run == 'true' &&
+          steps.state.outputs.state == 'CONTINUATION_REQUIRED'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_DATE: ${{ steps.state.outputs.date }}
+        shell: bash
+        run: |
+          echo "Checkpoint safely committed."
+          echo "Starting another collection pass for ${TARGET_DATE}."
+
+          gh workflow run collect-statsapi.yml \
+            --ref main \
+            -f date="${TARGET_DATE}"
+
+      - name: Collection complete
+        if: >
+          steps.guard.outputs.run == 'true' &&
+          steps.state.outputs.state == 'COMPLETE'
+        run: |
+          echo "Football collection COMPLETE."
+          echo "No continuation pass required."
