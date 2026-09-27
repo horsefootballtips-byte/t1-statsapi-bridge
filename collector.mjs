@@ -1,21 +1,25 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
 
 const API_BASE = "https://api.thestatsapi.com/api/football";
 const API_KEY = process.env.STATS_API_KEY;
 const TIMEZONE = "Europe/London";
+
+/*
+ * Each pass deliberately stops before GitHub's observed ~30-minute
+ * execution ceiling. Progress is committed by the workflow and the
+ * next pass resumes from the checkpoint.
+ */
+const PASS_BUDGET_MS = Number(
+  process.env.PASS_BUDGET_MS || 22 * 60 * 1000
+);
+
+const passStartedAt = Date.now();
 
 if (!API_KEY) {
   console.error("STATS_API_KEY is not configured.");
   process.exit(2);
 }
 
-/*
- * Shared caches.
- *
- * These are the important change. If several fixtures require the same
- * team's history, season statistics or historical match statistics,
- * StatsAPI is contacted once and the result is reused.
- */
 const cache = {
   histories: new Map(),
   teamStats: new Map(),
@@ -99,7 +103,7 @@ async function api(path, params = {}, allow404 = false) {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
         Accept: "application/json",
-        "User-Agent": "T1-GitHub-Collector/2.0"
+        "User-Agent": "T1-GitHub-Collector/3.0"
       }
     });
 
@@ -187,10 +191,6 @@ function seasonId(match) {
   return match?.season_id || match?.season?.id || null;
 }
 
-/*
- * Download a team's historical matches once per operating date.
- * Previously this could be downloaded again for every fixture.
- */
 async function recentHistory(team, targetMatch, date) {
   const targetKickoff = kickoffMs(targetMatch);
 
@@ -226,9 +226,6 @@ async function recentHistory(team, targetMatch, date) {
     .slice(0, 5);
 }
 
-/*
- * Season statistics are also cached.
- */
 async function getTeamStats(team, season) {
   if (!team || !season) return null;
 
@@ -262,9 +259,6 @@ async function getTeamStats(team, season) {
   }
 }
 
-/*
- * Historical match statistics are cached by match ID.
- */
 async function getMatchStats(match) {
   if (!match?.id || match?.xg_available !== true) {
     return null;
@@ -301,9 +295,6 @@ async function getMatchStats(match) {
   }
 }
 
-/*
- * Target-match odds are requested only once.
- */
 async function getMatchOdds(match) {
   if (!match?.id || match?.odds_available !== true) {
     return null;
@@ -358,10 +349,6 @@ async function enrichFixture(match, date) {
       getMatchOdds(match)
     ]);
 
-    /*
-     * Detailed stats are deliberately limited to the latest
-     * three relevant historical matches per side.
-     */
     const detailedMatches = [
       ...homeHistory.slice(0, 3),
       ...awayHistory.slice(0, 3)
@@ -393,7 +380,8 @@ async function enrichFixture(match, date) {
       .slice(0, 3)
       .map(row => ({
         match_id: row.id,
-        stats: detailedMap.get(String(row.id)) || null
+        stats:
+          detailedMap.get(String(row.id)) || null
       }))
       .filter(row => row.stats !== null);
 
@@ -401,12 +389,14 @@ async function enrichFixture(match, date) {
       .slice(0, 3)
       .map(row => ({
         match_id: row.id,
-        stats: detailedMap.get(String(row.id)) || null
+        stats:
+          detailedMap.get(String(row.id)) || null
       }))
       .filter(row => row.stats !== null);
 
     return {
       match,
+      state: "COMPLETE",
       home: {
         team_id: home,
         recent_matches: homeHistory,
@@ -430,37 +420,145 @@ async function enrichFixture(match, date) {
   }
 }
 
+async function readJsonIfExists(filename) {
+  try {
+    return JSON.parse(
+      await readFile(filename, "utf8")
+    );
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return null;
+    }
+
+    throw error;
+  }
+}
+
+async function saveCheckpoint(
+  date,
+  competitions,
+  fixtures,
+  enriched,
+  state = "IN_PROGRESS"
+) {
+  const filename =
+    `data/${date}.checkpoint.json`;
+
+  const payload = {
+    schema: "T1_STATSAPI_GITHUB_CHECKPOINT_V3",
+    generated_at_utc: new Date().toISOString(),
+    operating_date: date,
+    timezone: TIMEZONE,
+    source: "TheStatsAPI",
+    secret_free: true,
+    state,
+    competitions,
+    fixtures,
+    enriched_fixtures: enriched,
+    completed_match_ids: enriched
+      .map(row => String(row?.match?.id || ""))
+      .filter(Boolean),
+    diagnostics
+  };
+
+  await writeFile(
+    filename,
+    JSON.stringify(payload, null, 2) + "\n",
+    "utf8"
+  );
+
+  return filename;
+}
+
 async function collectDate(date, competitions) {
   const fixtures = await fetchAll("/matches", {
     date_from: date,
     date_to: date
   });
 
-  /*
-   * Preserve every fixture in the raw fixture list.
-   * Enrichment remains focused on fixtures where StatsAPI
-   * indicates useful advanced data.
-   */
   const candidates = fixtures.filter(match =>
     match?.odds_available === true ||
     match?.live_odds_available === true ||
     match?.xg_available === true
   );
 
-  const enriched = [];
+  const checkpointFile =
+    `data/${date}.checkpoint.json`;
+
+  const previous =
+    await readJsonIfExists(checkpointFile);
+
+  const fixtureIds = new Set(
+    fixtures
+      .map(row => String(row?.id || ""))
+      .filter(Boolean)
+  );
 
   /*
-   * Small batches are faster than one-at-a-time processing
-   * without hammering StatsAPI with every fixture simultaneously.
+   * Only retain checkpoint rows that still exist in today's
+   * current fixture manifest.
    */
+  const enriched =
+    Array.isArray(previous?.enriched_fixtures)
+      ? previous.enriched_fixtures.filter(row =>
+          fixtureIds.has(
+            String(row?.match?.id || "")
+          )
+        )
+      : [];
+
+  const completed = new Set(
+    enriched
+      .map(row => String(row?.match?.id || ""))
+      .filter(Boolean)
+  );
+
+  const remaining = candidates.filter(
+    row => !completed.has(String(row?.id || ""))
+  );
+
   const BATCH_SIZE = 4;
+
+  console.log(
+    `Resume ${date}: ` +
+    `${completed.size}/${candidates.length} already complete; ` +
+    `${remaining.length} remaining`
+  );
 
   for (
     let start = 0;
-    start < candidates.length;
+    start < remaining.length;
     start += BATCH_SIZE
   ) {
-    const batch = candidates.slice(
+    /*
+     * Stop ourselves before GitHub kills the job.
+     * This gives the workflow time to commit the checkpoint.
+     */
+    if (
+      Date.now() - passStartedAt >= PASS_BUDGET_MS
+    ) {
+      await saveCheckpoint(
+        date,
+        competitions,
+        fixtures,
+        enriched,
+        "CONTINUATION_REQUIRED"
+      );
+
+      console.log(
+        `CONTINUATION_REQUIRED ${date}: ` +
+        `${enriched.length}/${candidates.length}`
+      );
+
+      return {
+        complete: false,
+        fixture_count: fixtures.length,
+        candidate_count: candidates.length,
+        enriched_count: enriched.length
+      };
+    }
+
+    const batch = remaining.slice(
       start,
       start + BATCH_SIZE
     );
@@ -473,25 +571,57 @@ async function collectDate(date, competitions) {
 
     enriched.push(...results);
 
+    for (const row of results) {
+      if (row?.match?.id) {
+        completed.add(String(row.match.id));
+      }
+    }
+
+    /*
+     * Save after every batch.
+     */
+    await saveCheckpoint(
+      date,
+      competitions,
+      fixtures,
+      enriched,
+      "IN_PROGRESS"
+    );
+
     console.log(
-      `Progress ${date}: ${Math.min(
-        start + BATCH_SIZE,
-        candidates.length
-      )}/${candidates.length}`
+      `Progress ${date}: ` +
+      `${enriched.length}/${candidates.length}`
     );
   }
 
-  return {
-    schema: "T1_STATSAPI_GITHUB_SNAPSHOT_V2",
+  const snapshot = {
+    schema: "T1_STATSAPI_GITHUB_SNAPSHOT_V3",
     generated_at_utc: new Date().toISOString(),
     operating_date: date,
     timezone: TIMEZONE,
     source: "TheStatsAPI",
     secret_free: true,
+    state: "COMPLETE",
     competitions,
     fixtures,
     enriched_fixtures: enriched,
     diagnostics
+  };
+
+  await saveCheckpoint(
+    date,
+    competitions,
+    fixtures,
+    enriched,
+    "COMPLETE"
+  );
+
+  return {
+    complete: true,
+    snapshot,
+    fixture_count: fixtures.length,
+    candidate_count: candidates.length,
+    enriched_count: enriched.length
   };
 }
 
@@ -507,8 +637,12 @@ async function main() {
   }
 
   console.log(
-    `Starting T1 StatsAPI collection for ${baseDate}`
+    `Starting resumable StatsAPI collection for ${baseDate}`
   );
+
+  await mkdir("data", {
+    recursive: true
+  });
 
   const competitions =
     await fetchAll("/competitions");
@@ -521,42 +655,86 @@ async function main() {
       ]
     : [baseDate];
 
-  await mkdir("data", {
-    recursive: true
-  });
-
   const outputIndex = [];
+  let continuationRequired = false;
 
   for (const date of dates) {
+    /*
+     * If this date is already completely collected,
+     * don't waste another pass collecting it again.
+     */
+    const existingFinal =
+      await readJsonIfExists(`data/${date}.json`);
+
+    if (
+      existingFinal?.state === "COMPLETE" &&
+      existingFinal?.schema ===
+        "T1_STATSAPI_GITHUB_SNAPSHOT_V3"
+    ) {
+      outputIndex.push({
+        operating_date: date,
+        filename: `data/${date}.json`,
+        fixture_count:
+          existingFinal.fixtures?.length || 0,
+        enriched_count:
+          existingFinal.enriched_fixtures?.length || 0,
+        state: "COMPLETE"
+      });
+
+      continue;
+    }
+
     console.log(
       `Collecting StatsAPI data for ${date}`
     );
 
-    const snapshot =
+    const result =
       await collectDate(date, competitions);
+
+    if (!result.complete) {
+      continuationRequired = true;
+
+      outputIndex.push({
+        operating_date: date,
+        filename:
+          `data/${date}.checkpoint.json`,
+        fixture_count: result.fixture_count,
+        enriched_count: result.enriched_count,
+        state: "CONTINUATION_REQUIRED"
+      });
+
+      /*
+       * Stop this pass here. A continuation pass
+       * resumes this date from the checkpoint.
+       */
+      break;
+    }
 
     const filename =
       `data/${date}.json`;
 
     await writeFile(
       filename,
-      JSON.stringify(snapshot, null, 2) + "\n",
+      JSON.stringify(
+        result.snapshot,
+        null,
+        2
+      ) + "\n",
       "utf8"
     );
 
     outputIndex.push({
       operating_date: date,
       filename,
-      fixture_count:
-        snapshot.fixtures.length,
-      enriched_count:
-        snapshot.enriched_fixtures.length
+      fixture_count: result.fixture_count,
+      enriched_count: result.enriched_count,
+      state: "COMPLETE"
     });
 
     console.log(
       `Finished ${date}: ` +
-      `${snapshot.fixtures.length} fixtures, ` +
-      `${snapshot.enriched_fixtures.length} enriched`
+      `${result.fixture_count} fixtures, ` +
+      `${result.enriched_count} enriched`
     );
   }
 
@@ -564,13 +742,14 @@ async function main() {
     "data/latest.json",
     JSON.stringify(
       {
-        schema: "T1_STATSAPI_GITHUB_INDEX_V2",
+        schema: "T1_STATSAPI_GITHUB_INDEX_V3",
         generated_at_utc:
           new Date().toISOString(),
-        base_operating_date:
-          baseDate,
-        outputs:
-          outputIndex
+        base_operating_date: baseDate,
+        state: continuationRequired
+          ? "CONTINUATION_REQUIRED"
+          : "COMPLETE",
+        outputs: outputIndex
       },
       null,
       2
@@ -582,6 +761,8 @@ async function main() {
     JSON.stringify(
       {
         ok: true,
+        continuation_required:
+          continuationRequired,
         outputs: outputIndex,
         diagnostics
       },
