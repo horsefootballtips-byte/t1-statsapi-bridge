@@ -9,12 +9,29 @@ if (!API_KEY) {
   process.exit(2);
 }
 
+/*
+ * Shared caches.
+ *
+ * These are the important change. If several fixtures require the same
+ * team's history, season statistics or historical match statistics,
+ * StatsAPI is contacted once and the result is reused.
+ */
+const cache = {
+  histories: new Map(),
+  teamStats: new Map(),
+  matchStats: new Map(),
+  odds: new Map()
+};
+
 const diagnostics = {
   requests_total: 0,
   requests_by_route: {},
   pagination_pages: 0,
   retries: 0,
   rate_limit_events: 0,
+  cache_hits: 0,
+  cache_misses: 0,
+  duplicate_requests_avoided: 0,
   errors: []
 };
 
@@ -26,22 +43,25 @@ function londonDate() {
     day: "2-digit"
   }).formatToParts(new Date());
 
-  const get = t => parts.find(p => p.type === t)?.value;
+  const get = type =>
+    parts.find(part => part.type === type)?.value;
 
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
 function addDays(dateString, days) {
-  const d = new Date(`${dateString}T12:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
+  const date = new Date(`${dateString}T12:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
 }
 
 function isFriday(dateString) {
-  return new Date(`${dateString}T12:00:00Z`).getUTCDay() === 5;
+  return (
+    new Date(`${dateString}T12:00:00Z`).getUTCDay() === 5
+  );
 }
 
-async function sleep(ms) {
+function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -58,7 +78,11 @@ async function api(path, params = {}, allow404 = false) {
   const url = new URL(API_BASE + path);
 
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== "") {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value !== ""
+    ) {
       url.searchParams.set(key, String(value));
     }
   }
@@ -67,6 +91,7 @@ async function api(path, params = {}, allow404 = false) {
 
   for (let attempt = 0; attempt < 4; attempt++) {
     diagnostics.requests_total++;
+
     diagnostics.requests_by_route[family] =
       (diagnostics.requests_by_route[family] || 0) + 1;
 
@@ -74,7 +99,7 @@ async function api(path, params = {}, allow404 = false) {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
         Accept: "application/json",
-        "User-Agent": "T1-GitHub-Collector/1.0"
+        "User-Agent": "T1-GitHub-Collector/2.0"
       }
     });
 
@@ -85,7 +110,11 @@ async function api(path, params = {}, allow404 = false) {
     if (response.status === 429 && attempt < 3) {
       diagnostics.rate_limit_events++;
       diagnostics.retries++;
-      await sleep(2000 * (attempt + 1));
+
+      const retryAfter =
+        Number(response.headers.get("retry-after")) || 2;
+
+      await sleep(retryAfter * 1000);
       continue;
     }
 
@@ -95,15 +124,15 @@ async function api(path, params = {}, allow404 = false) {
       continue;
     }
 
-    const text = await response.text();
+    const body = await response.text();
 
     if (!response.ok) {
       throw new Error(
-        `StatsAPI HTTP ${response.status}: ${text.slice(0, 250)}`
+        `StatsAPI HTTP ${response.status}: ${body.slice(0, 250)}`
       );
     }
 
-    return text ? JSON.parse(text) : {};
+    return body ? JSON.parse(body) : {};
   }
 
   throw new Error(`Request failed: ${path}`);
@@ -158,84 +187,153 @@ function seasonId(match) {
   return match?.season_id || match?.season?.id || null;
 }
 
+/*
+ * Download a team's historical matches once per operating date.
+ * Previously this could be downloaded again for every fixture.
+ */
 async function recentHistory(team, targetMatch, date) {
   const targetKickoff = kickoffMs(targetMatch);
 
   if (!team || !targetKickoff) return [];
 
-  const history = await fetchAll("/matches", {
-    team_id: team,
-    status: "finished",
-    date_from: addDays(date, -400),
-    date_to: date
-  });
+  const key = `${team}|${date}`;
+
+  let history;
+
+  if (cache.histories.has(key)) {
+    diagnostics.cache_hits++;
+    diagnostics.duplicate_requests_avoided++;
+    history = cache.histories.get(key);
+  } else {
+    diagnostics.cache_misses++;
+
+    history = await fetchAll("/matches", {
+      team_id: team,
+      status: "finished",
+      date_from: addDays(date, -400),
+      date_to: date
+    });
+
+    cache.histories.set(key, history);
+  }
 
   return history
-    .filter(m => {
-      const k = kickoffMs(m);
-      return k && k < targetKickoff;
+    .filter(match => {
+      const kickoff = kickoffMs(match);
+      return kickoff && kickoff < targetKickoff;
     })
     .sort((a, b) => kickoffMs(b) - kickoffMs(a))
     .slice(0, 5);
 }
 
-async function teamStats(team, season) {
+/*
+ * Season statistics are also cached.
+ */
+async function getTeamStats(team, season) {
   if (!team || !season) return null;
 
+  const key = `${team}|${season}`;
+
+  if (cache.teamStats.has(key)) {
+    diagnostics.cache_hits++;
+    diagnostics.duplicate_requests_avoided++;
+    return cache.teamStats.get(key);
+  }
+
+  diagnostics.cache_misses++;
+
   try {
-    return await api(
+    const result = await api(
       `/teams/${encodeURIComponent(team)}/stats`,
       { season_id: season }
     );
-  } catch (err) {
+
+    cache.teamStats.set(key, result);
+    return result;
+  } catch (error) {
     diagnostics.errors.push({
       type: "TEAM_STATS",
       team,
-      message: String(err.message || err)
+      message: String(error.message || error)
     });
 
+    cache.teamStats.set(key, null);
     return null;
   }
 }
 
-async function matchStats(match) {
+/*
+ * Historical match statistics are cached by match ID.
+ */
+async function getMatchStats(match) {
   if (!match?.id || match?.xg_available !== true) {
     return null;
   }
 
+  const key = String(match.id);
+
+  if (cache.matchStats.has(key)) {
+    diagnostics.cache_hits++;
+    diagnostics.duplicate_requests_avoided++;
+    return cache.matchStats.get(key);
+  }
+
+  diagnostics.cache_misses++;
+
   try {
-    return await api(
+    const result = await api(
       `/matches/${encodeURIComponent(match.id)}/stats`,
       {},
       true
     );
-  } catch (err) {
+
+    cache.matchStats.set(key, result);
+    return result;
+  } catch (error) {
     diagnostics.errors.push({
       type: "MATCH_STATS",
       match_id: match.id,
-      message: String(err.message || err)
+      message: String(error.message || error)
     });
 
+    cache.matchStats.set(key, null);
     return null;
   }
 }
 
-async function matchOdds(match) {
+/*
+ * Target-match odds are requested only once.
+ */
+async function getMatchOdds(match) {
   if (!match?.id || match?.odds_available !== true) {
     return null;
   }
 
+  const key = String(match.id);
+
+  if (cache.odds.has(key)) {
+    diagnostics.cache_hits++;
+    diagnostics.duplicate_requests_avoided++;
+    return cache.odds.get(key);
+  }
+
+  diagnostics.cache_misses++;
+
   try {
-    return await api(
+    const result = await api(
       `/matches/${encodeURIComponent(match.id)}/odds`
     );
-  } catch (err) {
+
+    cache.odds.set(key, result);
+    return result;
+  } catch (error) {
     diagnostics.errors.push({
       type: "ODDS",
       match_id: match.id,
-      message: String(err.message || err)
+      message: String(error.message || error)
     });
 
+    cache.odds.set(key, null);
     return null;
   }
 }
@@ -255,35 +353,57 @@ async function enrichFixture(match, date) {
     ] = await Promise.all([
       recentHistory(home, match, date),
       recentHistory(away, match, date),
-      teamStats(home, season),
-      teamStats(away, season),
-      matchOdds(match)
+      getTeamStats(home, season),
+      getTeamStats(away, season),
+      getMatchOdds(match)
     ]);
 
-    const homeDetailed = [];
-    const awayDetailed = [];
+    /*
+     * Detailed stats are deliberately limited to the latest
+     * three relevant historical matches per side.
+     */
+    const detailedMatches = [
+      ...homeHistory.slice(0, 3),
+      ...awayHistory.slice(0, 3)
+    ];
 
-    for (const row of homeHistory.slice(0, 3)) {
-      const stats = await matchStats(row);
+    const uniqueDetailed = [
+      ...new Map(
+        detailedMatches
+          .filter(row => row?.id)
+          .map(row => [String(row.id), row])
+      ).values()
+    ];
 
-      if (stats) {
-        homeDetailed.push({
-          match_id: row.id,
-          stats
-        });
-      }
-    }
+    const detailedResults = await Promise.all(
+      uniqueDetailed.map(async row => ({
+        match_id: row.id,
+        stats: await getMatchStats(row)
+      }))
+    );
 
-    for (const row of awayHistory.slice(0, 3)) {
-      const stats = await matchStats(row);
+    const detailedMap = new Map(
+      detailedResults.map(row => [
+        String(row.match_id),
+        row.stats
+      ])
+    );
 
-      if (stats) {
-        awayDetailed.push({
-          match_id: row.id,
-          stats
-        });
-      }
-    }
+    const homeDetailed = homeHistory
+      .slice(0, 3)
+      .map(row => ({
+        match_id: row.id,
+        stats: detailedMap.get(String(row.id)) || null
+      }))
+      .filter(row => row.stats !== null);
+
+    const awayDetailed = awayHistory
+      .slice(0, 3)
+      .map(row => ({
+        match_id: row.id,
+        stats: detailedMap.get(String(row.id)) || null
+      }))
+      .filter(row => row.stats !== null);
 
     return {
       match,
@@ -301,11 +421,11 @@ async function enrichFixture(match, date) {
       },
       odds
     };
-  } catch (err) {
+  } catch (error) {
     return {
       match,
       state: "PARTIAL",
-      error: String(err.message || err)
+      error: String(error.message || error)
     };
   }
 }
@@ -316,23 +436,53 @@ async function collectDate(date, competitions) {
     date_to: date
   });
 
+  /*
+   * Preserve every fixture in the raw fixture list.
+   * Enrichment remains focused on fixtures where StatsAPI
+   * indicates useful advanced data.
+   */
+  const candidates = fixtures.filter(match =>
+    match?.odds_available === true ||
+    match?.live_odds_available === true ||
+    match?.xg_available === true
+  );
+
   const enriched = [];
 
-  for (const match of fixtures) {
-    const useful =
-      match?.odds_available === true ||
-      match?.live_odds_available === true ||
-      match?.xg_available === true;
+  /*
+   * Small batches are faster than one-at-a-time processing
+   * without hammering StatsAPI with every fixture simultaneously.
+   */
+  const BATCH_SIZE = 4;
 
-    if (!useful) continue;
+  for (
+    let start = 0;
+    start < candidates.length;
+    start += BATCH_SIZE
+  ) {
+    const batch = candidates.slice(
+      start,
+      start + BATCH_SIZE
+    );
 
-    enriched.push(
-      await enrichFixture(match, date)
+    const results = await Promise.all(
+      batch.map(match =>
+        enrichFixture(match, date)
+      )
+    );
+
+    enriched.push(...results);
+
+    console.log(
+      `Progress ${date}: ${Math.min(
+        start + BATCH_SIZE,
+        candidates.length
+      )}/${candidates.length}`
     );
   }
 
   return {
-    schema: "T1_STATSAPI_GITHUB_SNAPSHOT_V1",
+    schema: "T1_STATSAPI_GITHUB_SNAPSHOT_V2",
     generated_at_utc: new Date().toISOString(),
     operating_date: date,
     timezone: TIMEZONE,
@@ -353,10 +503,12 @@ async function main() {
     manualDate || londonDate();
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(baseDate)) {
-    throw new Error(
-      `Invalid date: ${baseDate}`
-    );
+    throw new Error(`Invalid date: ${baseDate}`);
   }
+
+  console.log(
+    `Starting T1 StatsAPI collection for ${baseDate}`
+  );
 
   const competitions =
     await fetchAll("/competitions");
@@ -400,14 +552,19 @@ async function main() {
       enriched_count:
         snapshot.enriched_fixtures.length
     });
+
+    console.log(
+      `Finished ${date}: ` +
+      `${snapshot.fixtures.length} fixtures, ` +
+      `${snapshot.enriched_fixtures.length} enriched`
+    );
   }
 
   await writeFile(
     "data/latest.json",
     JSON.stringify(
       {
-        schema:
-          "T1_STATSAPI_GITHUB_INDEX_V1",
+        schema: "T1_STATSAPI_GITHUB_INDEX_V2",
         generated_at_utc:
           new Date().toISOString(),
         base_operating_date:
@@ -434,9 +591,9 @@ async function main() {
   );
 }
 
-main().catch(err => {
+main().catch(error => {
   console.error(
-    String(err.message || err)
+    String(error.message || error)
   );
 
   process.exit(1);
