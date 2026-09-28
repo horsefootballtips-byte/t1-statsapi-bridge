@@ -103,7 +103,7 @@ async function api(path, params = {}, allow404 = false) {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
         Accept: "application/json",
-        "User-Agent": "T1-GitHub-Collector/3.0"
+        "User-Agent": "T5-GitHub-Collector/4.0"
       }
     });
 
@@ -380,8 +380,7 @@ async function enrichFixture(match, date) {
       .slice(0, 3)
       .map(row => ({
         match_id: row.id,
-        stats:
-          detailedMap.get(String(row.id)) || null
+        stats: detailedMap.get(String(row.id)) || null
       }))
       .filter(row => row.stats !== null);
 
@@ -389,14 +388,18 @@ async function enrichFixture(match, date) {
       .slice(0, 3)
       .map(row => ({
         match_id: row.id,
-        stats:
-          detailedMap.get(String(row.id)) || null
+        stats: detailedMap.get(String(row.id)) || null
       }))
       .filter(row => row.stats !== null);
 
     return {
       match,
       state: "COMPLETE",
+      availability: {
+        odds: match?.odds_available === true,
+        live_odds: match?.live_odds_available === true,
+        xg: match?.xg_available === true
+      },
       home: {
         team_id: home,
         recent_matches: homeHistory,
@@ -441,11 +444,10 @@ async function saveCheckpoint(
   enriched,
   state = "IN_PROGRESS"
 ) {
-  const filename =
-    `data/${date}.checkpoint.json`;
+  const filename = `data/${date}.checkpoint.json`;
 
   const payload = {
-    schema: "T1_STATSAPI_GITHUB_CHECKPOINT_V3",
+    schema: "T5_STATSAPI_GITHUB_CHECKPOINT_V4",
     generated_at_utc: new Date().toISOString(),
     operating_date: date,
     timezone: TIMEZONE,
@@ -476,11 +478,37 @@ async function collectDate(date, competitions) {
     date_to: date
   });
 
-  const candidates = fixtures.filter(match =>
-    match?.odds_available === true ||
-    match?.live_odds_available === true ||
-    match?.xg_available === true
-  );
+  /*
+   * IMPORTANT:
+   * Every fixture returned by StatsAPI is now an enrichment candidate.
+   * Missing odds/xG availability is NOT a reason to discard a match.
+   */
+  const candidates = fixtures;
+
+  const rawIds = fixtures
+    .map(row => String(row?.id || ""))
+    .filter(Boolean);
+
+  const uniqueIds = new Set(rawIds);
+
+  const manifestReconciliation = {
+    source_fixture_count: fixtures.length,
+    unique_fixture_count: uniqueIds.size,
+    duplicate_fixture_ids: rawIds.length - uniqueIds.size,
+    fixtures_with_home_and_away: fixtures.filter(
+      row => teamId(row, "home") && teamId(row, "away")
+    ).length,
+    competitions_represented: new Set(
+      fixtures
+        .map(row =>
+          row?.competition_id || row?.competition?.id
+        )
+        .filter(Boolean)
+    ).size,
+    state: "SOURCE_MANIFEST_RECONCILED",
+    note:
+      "Complete for the paginated StatsAPI date manifest only. T3 must independently reconcile the final William Hill eligible fixture universe."
+  };
 
   const checkpointFile =
     `data/${date}.checkpoint.json`;
@@ -494,10 +522,6 @@ async function collectDate(date, competitions) {
       .filter(Boolean)
   );
 
-  /*
-   * Only retain checkpoint rows that still exist in today's
-   * current fixture manifest.
-   */
   const enriched =
     Array.isArray(previous?.enriched_fixtures)
       ? previous.enriched_fixtures.filter(row =>
@@ -530,10 +554,6 @@ async function collectDate(date, competitions) {
     start < remaining.length;
     start += BATCH_SIZE
   ) {
-    /*
-     * Stop ourselves before GitHub kills the job.
-     * This gives the workflow time to commit the checkpoint.
-     */
     if (
       Date.now() - passStartedAt >= PASS_BUDGET_MS
     ) {
@@ -554,7 +574,8 @@ async function collectDate(date, competitions) {
         complete: false,
         fixture_count: fixtures.length,
         candidate_count: candidates.length,
-        enriched_count: enriched.length
+        enriched_count: enriched.length,
+        manifest_reconciliation: manifestReconciliation
       };
     }
 
@@ -577,9 +598,6 @@ async function collectDate(date, competitions) {
       }
     }
 
-    /*
-     * Save after every batch.
-     */
     await saveCheckpoint(
       date,
       competitions,
@@ -595,13 +613,14 @@ async function collectDate(date, competitions) {
   }
 
   const snapshot = {
-    schema: "T1_STATSAPI_GITHUB_SNAPSHOT_V3",
+    schema: "T5_STATSAPI_GITHUB_SNAPSHOT_V4",
     generated_at_utc: new Date().toISOString(),
     operating_date: date,
     timezone: TIMEZONE,
     source: "TheStatsAPI",
     secret_free: true,
     state: "COMPLETE",
+    manifest_reconciliation: manifestReconciliation,
     competitions,
     fixtures,
     enriched_fixtures: enriched,
@@ -621,7 +640,8 @@ async function collectDate(date, competitions) {
     snapshot,
     fixture_count: fixtures.length,
     candidate_count: candidates.length,
-    enriched_count: enriched.length
+    enriched_count: enriched.length,
+    manifest_reconciliation: manifestReconciliation
   };
 }
 
@@ -659,17 +679,17 @@ async function main() {
   let continuationRequired = false;
 
   for (const date of dates) {
-    /*
-     * If this date is already completely collected,
-     * don't waste another pass collecting it again.
-     */
     const existingFinal =
       await readJsonIfExists(`data/${date}.json`);
 
+    /*
+     * Only V4 is considered current.
+     * An older V3 snapshot is therefore rebuilt automatically.
+     */
     if (
       existingFinal?.state === "COMPLETE" &&
       existingFinal?.schema ===
-        "T1_STATSAPI_GITHUB_SNAPSHOT_V3"
+        "T5_STATSAPI_GITHUB_SNAPSHOT_V4"
     ) {
       outputIndex.push({
         operating_date: date,
@@ -703,10 +723,6 @@ async function main() {
         state: "CONTINUATION_REQUIRED"
       });
 
-      /*
-       * Stop this pass here. A continuation pass
-       * resumes this date from the checkpoint.
-       */
       break;
     }
 
@@ -742,7 +758,7 @@ async function main() {
     "data/latest.json",
     JSON.stringify(
       {
-        schema: "T1_STATSAPI_GITHUB_INDEX_V3",
+        schema: "T5_STATSAPI_GITHUB_INDEX_V4",
         generated_at_utc:
           new Date().toISOString(),
         base_operating_date: baseDate,
