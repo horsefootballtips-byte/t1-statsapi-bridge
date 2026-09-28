@@ -1,14 +1,14 @@
 {
-  "schema": "T1_STATSAPI_GITHUB_INDEX_V3",
-  "generated_at_utc": "2026-09-28T02:20:04.906Z",
+  "schema": "T5_STATSAPI_GITHUB_INDEX_V4",
+  "generated_at_utc": "2026-09-28T20:39:01.075Z",
   "base_operating_date": "2026-09-28",
   "state": "COMPLETE",
   "outputs": [
     {
       "operating_date": "2026-09-28",
       "filename": "data/2026-09-28.json",
-      "fixture_count": 37,
-      "enriched_count": 33,
+      "fixture_count": 38,
+      "enriched_count": 38,
       "state": "COMPLETE"
     }
   ]
