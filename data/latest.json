@@ -1,15 +1,15 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V4",
-  "generated_at_utc": "2026-09-28T20:39:01.075Z",
-  "base_operating_date": "2026-09-28",
-  "state": "COMPLETE",
+  "generated_at_utc": "2026-09-29T02:24:01.816Z",
+  "base_operating_date": "2026-09-29",
+  "state": "CONTINUATION_REQUIRED",
   "outputs": [
     {
-      "operating_date": "2026-09-28",
-      "filename": "data/2026-09-28.json",
-      "fixture_count": 38,
-      "enriched_count": 38,
-      "state": "COMPLETE"
+      "operating_date": "2026-09-29",
+      "filename": "data/2026-09-29.checkpoint.json",
+      "fixture_count": 69,
+      "enriched_count": 52,
+      "state": "CONTINUATION_REQUIRED"
     }
   ]
 }
