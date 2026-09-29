@@ -1,14 +1,10 @@
-import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile, stat } from "node:fs/promises";
+import { createHash } from "node:crypto";
 
 const API_BASE = "https://api.thestatsapi.com/api/football";
 const API_KEY = process.env.STATS_API_KEY;
 const TIMEZONE = "Europe/London";
 
-/*
- * Each pass deliberately stops before GitHub's observed ~30-minute
- * execution ceiling. Progress is committed by the workflow and the
- * next pass resumes from the checkpoint.
- */
 const PASS_BUDGET_MS = Number(
   process.env.PASS_BUDGET_MS || 22 * 60 * 1000
 );
@@ -60,9 +56,7 @@ function addDays(dateString, days) {
 }
 
 function isFriday(dateString) {
-  return (
-    new Date(`${dateString}T12:00:00Z`).getUTCDay() === 5
-  );
+  return new Date(`${dateString}T12:00:00Z`).getUTCDay() === 5;
 }
 
 function sleep(ms) {
@@ -103,7 +97,7 @@ async function api(path, params = {}, allow404 = false) {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
         Accept: "application/json",
-        "User-Agent": "T5-GitHub-Collector/4.0"
+        "User-Agent": "T5-GitHub-Collector/5.0"
       }
     });
 
@@ -437,6 +431,151 @@ async function readJsonIfExists(filename) {
   }
 }
 
+/*
+ * FINAL T5 VALIDATION
+ *
+ * This reads the large file back from the local GitHub Actions
+ * filesystem. It therefore does NOT depend on GitHub's Contents API,
+ * which is what caused the huge file to appear blank to us.
+ */
+async function validateFinalSnapshot(
+  filename,
+  expectedDate,
+  expectedFixtures,
+  expectedEnriched
+) {
+  const raw = await readFile(filename, "utf8");
+
+  if (!raw || raw.length === 0) {
+    throw new Error(
+      `T5 FINAL VALIDATION FAILED: ${filename} is empty`
+    );
+  }
+
+  const parsed = JSON.parse(raw);
+  const fileInfo = await stat(filename);
+
+  const sha256 = createHash("sha256")
+    .update(raw, "utf8")
+    .digest("hex");
+
+  const fixtures =
+    Array.isArray(parsed?.fixtures)
+      ? parsed.fixtures
+      : [];
+
+  const enriched =
+    Array.isArray(parsed?.enriched_fixtures)
+      ? parsed.enriched_fixtures
+      : [];
+
+  const fixtureIds = fixtures
+    .map(row => String(row?.id || ""))
+    .filter(Boolean);
+
+  const enrichedIds = enriched
+    .map(row => String(row?.match?.id || ""))
+    .filter(Boolean);
+
+  const uniqueFixtureIds =
+    new Set(fixtureIds);
+
+  const uniqueEnrichedIds =
+    new Set(enrichedIds);
+
+  const fixtureIdSet =
+    new Set(fixtureIds);
+
+  const missingTeamCount =
+    fixtures.filter(
+      row =>
+        !teamId(row, "home") ||
+        !teamId(row, "away")
+    ).length;
+
+  const orphanEnrichedCount =
+    enrichedIds.filter(
+      id => !fixtureIdSet.has(id)
+    ).length;
+
+  const validation = {
+    schema_ok:
+      parsed?.schema ===
+      "T5_STATSAPI_GITHUB_SNAPSHOT_V4",
+
+    operating_date_ok:
+      parsed?.operating_date === expectedDate,
+
+    snapshot_state_ok:
+      parsed?.state === "COMPLETE",
+
+    expected_fixture_count:
+      expectedFixtures,
+
+    actual_fixture_count:
+      fixtures.length,
+
+    expected_enriched_count:
+      expectedEnriched,
+
+    actual_enriched_count:
+      enriched.length,
+
+    unique_fixture_count:
+      uniqueFixtureIds.size,
+
+    unique_enriched_count:
+      uniqueEnrichedIds.size,
+
+    missing_team_count:
+      missingTeamCount,
+
+    orphan_enriched_count:
+      orphanEnrichedCount,
+
+    byte_size:
+      fileInfo.size,
+
+    sha256
+  };
+
+  const valid =
+    validation.schema_ok &&
+    validation.operating_date_ok &&
+    validation.snapshot_state_ok &&
+    expectedFixtures > 0 &&
+    fixtures.length === expectedFixtures &&
+    enriched.length === expectedEnriched &&
+    expectedEnriched === expectedFixtures &&
+    fixtureIds.length === fixtures.length &&
+    uniqueFixtureIds.size === fixtures.length &&
+    enrichedIds.length === enriched.length &&
+    uniqueEnrichedIds.size === enriched.length &&
+    missingTeamCount === 0 &&
+    orphanEnrichedCount === 0 &&
+    fileInfo.size > 0;
+
+  validation.state =
+    valid
+      ? "VALIDATED"
+      : "FAILED_VALIDATION";
+
+  if (!valid) {
+    throw new Error(
+      "T5 FINAL VALIDATION FAILED: " +
+      JSON.stringify(validation)
+    );
+  }
+
+  console.log(
+    `T5 VALIDATED ${expectedDate}: ` +
+    `${fixtures.length}/${enriched.length}, ` +
+    `${fileInfo.size} bytes, SHA256 ${sha256}`
+  );
+
+  return validation;
+}
+
 async function saveCheckpoint(
   date,
   competitions,
@@ -478,11 +617,6 @@ async function collectDate(date, competitions) {
     date_to: date
   });
 
-  /*
-   * IMPORTANT:
-   * Every fixture returned by StatsAPI is now an enrichment candidate.
-   * Missing odds/xG availability is NOT a reason to discard a match.
-   */
   const candidates = fixtures;
 
   const rawIds = fixtures
@@ -494,18 +628,28 @@ async function collectDate(date, competitions) {
   const manifestReconciliation = {
     source_fixture_count: fixtures.length,
     unique_fixture_count: uniqueIds.size,
-    duplicate_fixture_ids: rawIds.length - uniqueIds.size,
-    fixtures_with_home_and_away: fixtures.filter(
-      row => teamId(row, "home") && teamId(row, "away")
-    ).length,
-    competitions_represented: new Set(
-      fixtures
-        .map(row =>
-          row?.competition_id || row?.competition?.id
-        )
-        .filter(Boolean)
-    ).size,
+    duplicate_fixture_ids:
+      rawIds.length - uniqueIds.size,
+
+    fixtures_with_home_and_away:
+      fixtures.filter(
+        row =>
+          teamId(row, "home") &&
+          teamId(row, "away")
+      ).length,
+
+    competitions_represented:
+      new Set(
+        fixtures
+          .map(row =>
+            row?.competition_id ||
+            row?.competition?.id
+          )
+          .filter(Boolean)
+      ).size,
+
     state: "SOURCE_MANIFEST_RECONCILED",
+
     note:
       "Complete for the paginated StatsAPI date manifest only. T3 must independently reconcile the final William Hill eligible fixture universe."
   };
@@ -533,13 +677,19 @@ async function collectDate(date, competitions) {
 
   const completed = new Set(
     enriched
-      .map(row => String(row?.match?.id || ""))
+      .map(row =>
+        String(row?.match?.id || "")
+      )
       .filter(Boolean)
   );
 
-  const remaining = candidates.filter(
-    row => !completed.has(String(row?.id || ""))
-  );
+  const remaining =
+    candidates.filter(
+      row =>
+        !completed.has(
+          String(row?.id || "")
+        )
+    );
 
   const BATCH_SIZE = 4;
 
@@ -555,7 +705,8 @@ async function collectDate(date, competitions) {
     start += BATCH_SIZE
   ) {
     if (
-      Date.now() - passStartedAt >= PASS_BUDGET_MS
+      Date.now() - passStartedAt >=
+      PASS_BUDGET_MS
     ) {
       await saveCheckpoint(
         date,
@@ -575,26 +726,31 @@ async function collectDate(date, competitions) {
         fixture_count: fixtures.length,
         candidate_count: candidates.length,
         enriched_count: enriched.length,
-        manifest_reconciliation: manifestReconciliation
+        manifest_reconciliation:
+          manifestReconciliation
       };
     }
 
-    const batch = remaining.slice(
-      start,
-      start + BATCH_SIZE
-    );
+    const batch =
+      remaining.slice(
+        start,
+        start + BATCH_SIZE
+      );
 
-    const results = await Promise.all(
-      batch.map(match =>
-        enrichFixture(match, date)
-      )
-    );
+    const results =
+      await Promise.all(
+        batch.map(match =>
+          enrichFixture(match, date)
+        )
+      );
 
     enriched.push(...results);
 
     for (const row of results) {
       if (row?.match?.id) {
-        completed.add(String(row.match.id));
+        completed.add(
+          String(row.match.id)
+        );
       }
     }
 
@@ -614,13 +770,18 @@ async function collectDate(date, competitions) {
 
   const snapshot = {
     schema: "T5_STATSAPI_GITHUB_SNAPSHOT_V4",
-    generated_at_utc: new Date().toISOString(),
+    generated_at_utc:
+      new Date().toISOString(),
+
     operating_date: date,
     timezone: TIMEZONE,
     source: "TheStatsAPI",
     secret_free: true,
     state: "COMPLETE",
-    manifest_reconciliation: manifestReconciliation,
+
+    manifest_reconciliation:
+      manifestReconciliation,
+
     competitions,
     fixtures,
     enriched_fixtures: enriched,
@@ -641,7 +802,8 @@ async function collectDate(date, competitions) {
     fixture_count: fixtures.length,
     candidate_count: candidates.length,
     enriched_count: enriched.length,
-    manifest_reconciliation: manifestReconciliation
+    manifest_reconciliation:
+      manifestReconciliation
   };
 }
 
@@ -652,8 +814,12 @@ async function main() {
   const baseDate =
     manualDate || londonDate();
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(baseDate)) {
-    throw new Error(`Invalid date: ${baseDate}`);
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(baseDate)
+  ) {
+    throw new Error(
+      `Invalid date: ${baseDate}`
+    );
   }
 
   console.log(
@@ -667,39 +833,66 @@ async function main() {
   const competitions =
     await fetchAll("/competitions");
 
-  const dates = isFriday(baseDate)
-    ? [
-        baseDate,
-        addDays(baseDate, 1),
-        addDays(baseDate, 2)
-      ]
-    : [baseDate];
+  const dates =
+    isFriday(baseDate)
+      ? [
+          baseDate,
+          addDays(baseDate, 1),
+          addDays(baseDate, 2)
+        ]
+      : [baseDate];
 
   const outputIndex = [];
   let continuationRequired = false;
 
   for (const date of dates) {
+    const existingFilename =
+      `data/${date}.json`;
+
     const existingFinal =
-      await readJsonIfExists(`data/${date}.json`);
+      await readJsonIfExists(
+        existingFilename
+      );
 
     /*
-     * Only V4 is considered current.
-     * An older V3 snapshot is therefore rebuilt automatically.
+     * Existing COMPLETE files are no longer
+     * blindly trusted.
+     *
+     * They must pass the same local read-back
+     * validation first.
      */
     if (
       existingFinal?.state === "COMPLETE" &&
       existingFinal?.schema ===
         "T5_STATSAPI_GITHUB_SNAPSHOT_V4"
     ) {
+      const fixtureCount =
+        existingFinal.fixtures?.length || 0;
+
+      const enrichedCount =
+        existingFinal
+          .enriched_fixtures?.length || 0;
+
+      const validation =
+        await validateFinalSnapshot(
+          existingFilename,
+          date,
+          fixtureCount,
+          enrichedCount
+        );
+
       outputIndex.push({
         operating_date: date,
-        filename: `data/${date}.json`,
-        fixture_count:
-          existingFinal.fixtures?.length || 0,
-        enriched_count:
-          existingFinal.enriched_fixtures?.length || 0,
-        state: "COMPLETE"
+        filename: existingFilename,
+        fixture_count: fixtureCount,
+        enriched_count: enrichedCount,
+        state: "COMPLETE",
+        validation
       });
+
+      console.log(
+        `Existing T5 snapshot ${date} passed validation`
+      );
 
       continue;
     }
@@ -709,18 +902,28 @@ async function main() {
     );
 
     const result =
-      await collectDate(date, competitions);
+      await collectDate(
+        date,
+        competitions
+      );
 
     if (!result.complete) {
       continuationRequired = true;
 
       outputIndex.push({
         operating_date: date,
+
         filename:
           `data/${date}.checkpoint.json`,
-        fixture_count: result.fixture_count,
-        enriched_count: result.enriched_count,
-        state: "CONTINUATION_REQUIRED"
+
+        fixture_count:
+          result.fixture_count,
+
+        enriched_count:
+          result.enriched_count,
+
+        state:
+          "CONTINUATION_REQUIRED"
       });
 
       break;
@@ -729,6 +932,9 @@ async function main() {
     const filename =
       `data/${date}.json`;
 
+    /*
+     * Write the full large T5 archive.
+     */
     await writeFile(
       filename,
       JSON.stringify(
@@ -739,37 +945,74 @@ async function main() {
       "utf8"
     );
 
+    /*
+     * CRITICAL:
+     * Re-open the file locally and prove it
+     * is healthy BEFORE declaring COMPLETE.
+     */
+    const validation =
+      await validateFinalSnapshot(
+        filename,
+        date,
+        result.fixture_count,
+        result.enriched_count
+      );
+
     outputIndex.push({
       operating_date: date,
       filename,
-      fixture_count: result.fixture_count,
-      enriched_count: result.enriched_count,
-      state: "COMPLETE"
+
+      fixture_count:
+        result.fixture_count,
+
+      enriched_count:
+        result.enriched_count,
+
+      state: "COMPLETE",
+
+      validation
     });
 
     console.log(
-      `Finished ${date}: ` +
+      `Finished and VALIDATED ${date}: ` +
       `${result.fixture_count} fixtures, ` +
       `${result.enriched_count} enriched`
     );
   }
 
+  /*
+   * latest.json stays small.
+   *
+   * It now contains the validation result,
+   * file size and SHA-256 of the authoritative
+   * big T5 dataset.
+   */
   await writeFile(
     "data/latest.json",
+
     JSON.stringify(
       {
-        schema: "T5_STATSAPI_GITHUB_INDEX_V4",
+        schema:
+          "T5_STATSAPI_GITHUB_INDEX_V5",
+
         generated_at_utc:
           new Date().toISOString(),
-        base_operating_date: baseDate,
-        state: continuationRequired
-          ? "CONTINUATION_REQUIRED"
-          : "COMPLETE",
-        outputs: outputIndex
+
+        base_operating_date:
+          baseDate,
+
+        state:
+          continuationRequired
+            ? "CONTINUATION_REQUIRED"
+            : "COMPLETE",
+
+        outputs:
+          outputIndex
       },
       null,
       2
     ) + "\n",
+
     "utf8"
   );
 
@@ -777,9 +1020,13 @@ async function main() {
     JSON.stringify(
       {
         ok: true,
+
         continuation_required:
           continuationRequired,
-        outputs: outputIndex,
+
+        outputs:
+          outputIndex,
+
         diagnostics
       },
       null,
