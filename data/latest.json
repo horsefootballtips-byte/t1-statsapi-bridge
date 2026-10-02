@@ -1,31 +1,61 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-10-01T02:05:01.481Z",
-  "base_operating_date": "2026-10-01",
-  "state": "COMPLETE",
+  "generated_at_utc": "2026-10-02T02:25:01.602Z",
+  "base_operating_date": "2026-10-02",
+  "state": "CONTINUATION_REQUIRED",
   "outputs": [
     {
-      "operating_date": "2026-10-01",
-      "filename": "data/2026-10-01.json",
-      "fixture_count": 55,
-      "enriched_count": 55,
+      "operating_date": "2026-10-02",
+      "filename": "data/2026-10-02.json",
+      "fixture_count": 66,
+      "enriched_count": 66,
       "state": "COMPLETE",
       "validation": {
         "schema_ok": true,
         "operating_date_ok": true,
         "snapshot_state_ok": true,
-        "expected_fixture_count": 55,
-        "actual_fixture_count": 55,
-        "expected_enriched_count": 55,
-        "actual_enriched_count": 55,
-        "unique_fixture_count": 55,
-        "unique_enriched_count": 55,
+        "expected_fixture_count": 66,
+        "actual_fixture_count": 66,
+        "expected_enriched_count": 66,
+        "actual_enriched_count": 66,
+        "unique_fixture_count": 66,
+        "unique_enriched_count": 66,
         "missing_team_count": 0,
         "orphan_enriched_count": 0,
-        "byte_size": 11272764,
-        "sha256": "4394f52fb0f0c10d2593821014b568262746532d364c072e8c4e3d3d4373d928",
+        "byte_size": 16095061,
+        "sha256": "cfce9e3179d3547314c4c3f8bf256bab5cf9bd628ebca53f3f5681a1a6650def",
         "state": "VALIDATED"
       }
+    },
+    {
+      "operating_date": "2026-10-03",
+      "filename": "data/2026-10-03.json",
+      "fixture_count": 273,
+      "enriched_count": 273,
+      "state": "COMPLETE",
+      "validation": {
+        "schema_ok": true,
+        "operating_date_ok": true,
+        "snapshot_state_ok": true,
+        "expected_fixture_count": 273,
+        "actual_fixture_count": 273,
+        "expected_enriched_count": 273,
+        "actual_enriched_count": 273,
+        "unique_fixture_count": 273,
+        "unique_enriched_count": 273,
+        "missing_team_count": 0,
+        "orphan_enriched_count": 0,
+        "byte_size": 35154710,
+        "sha256": "d90adac50d9f4238dbe164c0a14d7896813a603a3fc6a547e556337098bc25e7",
+        "state": "VALIDATED"
+      }
+    },
+    {
+      "operating_date": "2026-10-04",
+      "filename": "data/2026-10-04.checkpoint.json",
+      "fixture_count": 117,
+      "enriched_count": 80,
+      "state": "CONTINUATION_REQUIRED"
     }
   ]
 }
