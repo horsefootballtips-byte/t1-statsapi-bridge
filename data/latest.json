@@ -1,29 +1,29 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-10-06T02:06:01.919Z",
-  "base_operating_date": "2026-10-06",
+  "generated_at_utc": "2026-10-07T02:06:03.977Z",
+  "base_operating_date": "2026-10-07",
   "state": "COMPLETE",
   "outputs": [
     {
-      "operating_date": "2026-10-06",
-      "filename": "data/2026-10-06.json",
-      "fixture_count": 89,
-      "enriched_count": 89,
+      "operating_date": "2026-10-07",
+      "filename": "data/2026-10-07.json",
+      "fixture_count": 65,
+      "enriched_count": 65,
       "state": "COMPLETE",
       "validation": {
         "schema_ok": true,
         "operating_date_ok": true,
         "snapshot_state_ok": true,
-        "expected_fixture_count": 89,
-        "actual_fixture_count": 89,
-        "expected_enriched_count": 89,
-        "actual_enriched_count": 89,
-        "unique_fixture_count": 89,
-        "unique_enriched_count": 89,
+        "expected_fixture_count": 65,
+        "actual_fixture_count": 65,
+        "expected_enriched_count": 65,
+        "actual_enriched_count": 65,
+        "unique_fixture_count": 65,
+        "unique_enriched_count": 65,
         "missing_team_count": 0,
         "orphan_enriched_count": 0,
-        "byte_size": 21267647,
-        "sha256": "2869429bb1f99f6dce266097e06901d4511a6df36bf9bd0ec830f996a89d2e87",
+        "byte_size": 12514180,
+        "sha256": "d13fa9c991066178a6d0259827e28286e721816eac4b84c068264624d5466c56",
         "state": "VALIDATED"
       }
     }
