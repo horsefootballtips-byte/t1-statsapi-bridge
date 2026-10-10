@@ -1,0 +1,53 @@
+name: Publish compact T3 fixture batches
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Optional date (YYYY-MM-DD); blank uses completed dates from data/latest.json"
+        required: false
+        type: string
+  push:
+    paths:
+      - "t3-shard-handoff.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: t3-shard-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Generate and independently validate T3 shards
+        env:
+          TARGET_DATE: ${{ github.event.inputs.date || '' }}
+        run: node t3-shard-handoff.mjs
+      - name: Publish atomically
+        shell: bash
+        run: |
+          git config user.name "T5-T3 Shard Publisher"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/t3/
+          if git diff --cached --quiet; then
+            echo "Shards already published, nothing to commit."
+            exit 0
+          fi
+          git commit -m "Publish validated compact T5 to T3 fixture shards"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git pull --rebase origin main
+            sleep 2
+          done
+          echo "Could not publish validated T3 handoff"
+          exit 1
