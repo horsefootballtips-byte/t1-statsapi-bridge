@@ -1,32 +1,9 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-10-16T03:16:11.370Z",
-  "base_operating_date": "2026-10-16",
+  "generated_at_utc": "2026-10-17T02:14:41.262Z",
+  "base_operating_date": "2026-10-17",
   "state": "COMPLETE",
   "outputs": [
-    {
-      "operating_date": "2026-10-16",
-      "filename": "data/2026-10-16.json",
-      "fixture_count": 127,
-      "enriched_count": 127,
-      "state": "COMPLETE",
-      "validation": {
-        "schema_ok": true,
-        "operating_date_ok": true,
-        "snapshot_state_ok": true,
-        "expected_fixture_count": 127,
-        "actual_fixture_count": 127,
-        "expected_enriched_count": 127,
-        "actual_enriched_count": 127,
-        "unique_fixture_count": 127,
-        "unique_enriched_count": 127,
-        "missing_team_count": 0,
-        "orphan_enriched_count": 0,
-        "byte_size": 28676673,
-        "sha256": "d510accc6499ff0c9fb6fd53ea6bdb08a47541a35018aeb4fccff41d3fc7962f",
-        "state": "VALIDATED"
-      }
-    },
     {
       "operating_date": "2026-10-17",
       "filename": "data/2026-10-17.json",
@@ -47,29 +24,6 @@
         "orphan_enriched_count": 0,
         "byte_size": 81698923,
         "sha256": "b4524a0b7203afaae11d2dad8eeb2b6a1257059e09f21e64c61f2a78313be028",
-        "state": "VALIDATED"
-      }
-    },
-    {
-      "operating_date": "2026-10-18",
-      "filename": "data/2026-10-18.json",
-      "fixture_count": 345,
-      "enriched_count": 345,
-      "state": "COMPLETE",
-      "validation": {
-        "schema_ok": true,
-        "operating_date_ok": true,
-        "snapshot_state_ok": true,
-        "expected_fixture_count": 345,
-        "actual_fixture_count": 345,
-        "expected_enriched_count": 345,
-        "actual_enriched_count": 345,
-        "unique_fixture_count": 345,
-        "unique_enriched_count": 345,
-        "missing_team_count": 0,
-        "orphan_enriched_count": 0,
-        "byte_size": 43147099,
-        "sha256": "1f58ca355d59979b443fd0a6662f170bf15254066b7c85055aba8b2b02b00f00",
         "state": "VALIDATED"
       }
     }
