@@ -1,6 +1,6 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-10-23T02:40:01.964Z",
+  "generated_at_utc": "2026-10-23T03:04:01.468Z",
   "base_operating_date": "2026-10-23",
   "state": "CONTINUATION_REQUIRED",
   "outputs": [
@@ -29,9 +29,32 @@
     },
     {
       "operating_date": "2026-10-24",
-      "filename": "data/2026-10-24.checkpoint.json",
+      "filename": "data/2026-10-24.json",
       "fixture_count": 523,
-      "enriched_count": 268,
+      "enriched_count": 523,
+      "state": "COMPLETE",
+      "validation": {
+        "schema_ok": true,
+        "operating_date_ok": true,
+        "snapshot_state_ok": true,
+        "expected_fixture_count": 523,
+        "actual_fixture_count": 523,
+        "expected_enriched_count": 523,
+        "actual_enriched_count": 523,
+        "unique_fixture_count": 523,
+        "unique_enriched_count": 523,
+        "missing_team_count": 0,
+        "orphan_enriched_count": 0,
+        "byte_size": 89599503,
+        "sha256": "cc888d53603bf6f38e6160f10fda9f6172d17ae4f75f18bcd4710ec42bfcf520",
+        "state": "VALIDATED"
+      }
+    },
+    {
+      "operating_date": "2026-10-25",
+      "filename": "data/2026-10-25.checkpoint.json",
+      "fixture_count": 300,
+      "enriched_count": 128,
       "state": "CONTINUATION_REQUIRED"
     }
   ]
