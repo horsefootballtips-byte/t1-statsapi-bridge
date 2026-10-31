@@ -929,6 +929,63 @@ async function main() {
         `Existing T5 snapshot ${date} passed validation`
       );
 
+      const playerFile = `data/${date}.players.json`;
+
+      const brentfordRows = existingFinal.enriched_fixtures.filter(
+        row => /brentford/i.test([
+          row.match?.home_team?.name,
+          row.match?.home_team_name,
+          row.match?.away_team?.name,
+          row.match?.away_team_name
+        ].filter(Boolean).join(" "))
+      );
+
+      if (
+        brentfordRows.length > 0 &&
+        !(await readJsonIfExists(playerFile))
+      ) {
+        const playerResults = [];
+
+        for (const row of brentfordRows) {
+          const playerData = await playerCollector.collectForFixture(
+            row.match,
+            row.home?.recent_matches || [],
+            row.away?.recent_matches || []
+          ).catch(error => ({
+            state: "UNRESOLVED",
+            reason: String(error?.message || error)
+          }));
+
+          playerResults.push({
+            match_id: row.match.id,
+            player_data: playerData
+          });
+        }
+
+        if (!playerResults.every(row =>
+          row.player_data?.state === "COLLECTED" &&
+          row.player_data?.coverage?.home_squad > 0 &&
+          row.player_data?.coverage?.away_squad > 0
+        )) {
+          console.log("Player squads incomplete; retry next run.");
+          continue;
+        }
+
+        await writeFile(
+          playerFile,
+          JSON.stringify({
+            operating_date: date,
+            source_snapshot: existingFilename,
+            source_sha256: validation.sha256,
+            generated_at_utc: new Date().toISOString(),
+            fixtures: playerResults
+          }, null, 2) + "\n",
+          "utf8"
+        );
+
+        console.log(`Player data saved to ${playerFile}`);
+      }
+
       continue;
     }
 
