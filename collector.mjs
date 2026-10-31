@@ -217,7 +217,7 @@ async function recentHistory(team, targetMatch, date) {
       return kickoff && kickoff < targetKickoff;
     })
     .sort((a, b) => kickoffMs(b) - kickoffMs(a))
-    .slice(0, 5);
+    .slice(0, 15);
 }
 
 async function getTeamStats(team, season) {
@@ -254,7 +254,7 @@ async function getTeamStats(team, season) {
 }
 
 async function getMatchStats(match) {
-  if (!match?.id || match?.xg_available !== true) {
+  if (!match?.id) {
     return null;
   }
 
@@ -343,10 +343,18 @@ async function enrichFixture(match, date) {
       getMatchOdds(match)
     ]);
 
-    const detailedMatches = [
-      ...homeHistory.slice(0, 3),
-      ...awayHistory.slice(0, 3)
-    ];
+   const isBrentfordMatch =
+  String(match?.home_team?.name || match?.home_team_name || "")
+    .toLowerCase().includes("brentford") ||
+  String(match?.away_team?.name || match?.away_team_name || "")
+    .toLowerCase().includes("brentford");
+
+const detailedDepth = isBrentfordMatch ? 15 : 5;
+
+const detailedMatches = [
+  ...homeHistory.slice(0, detailedDepth),
+  ...awayHistory.slice(0, detailedDepth)
+];
 
     const uniqueDetailed = [
       ...new Map(
@@ -356,12 +364,21 @@ async function enrichFixture(match, date) {
       ).values()
     ];
 
-    const detailedResults = await Promise.all(
-      uniqueDetailed.map(async row => ({
-        match_id: row.id,
-        stats: await getMatchStats(row)
-      }))
-    );
+    const detailedResults = [];
+
+for (let i = 0; i < uniqueDetailed.length; i += 3) {
+  const batch = uniqueDetailed.slice(i, i + 3);
+
+  const results = await Promise.all(
+    batch.map(async row => ({
+      match_id: row.id,
+      stats: await getMatchStats(row)
+    }))
+  );
+
+  detailedResults.push(...results);
+  await sleep(1000);
+}
 
     const detailedMap = new Map(
       detailedResults.map(row => [
@@ -371,7 +388,7 @@ async function enrichFixture(match, date) {
     );
 
     const homeDetailed = homeHistory
-      .slice(0, 3)
+      .slice(0, detailedDepth)
       .map(row => ({
         match_id: row.id,
         stats: detailedMap.get(String(row.id)) || null
@@ -379,7 +396,7 @@ async function enrichFixture(match, date) {
       .filter(row => row.stats !== null);
 
     const awayDetailed = awayHistory
-      .slice(0, 3)
+      .slice(0, detailedDepth)
       .map(row => ({
         match_id: row.id,
         stats: detailedMap.get(String(row.id)) || null
