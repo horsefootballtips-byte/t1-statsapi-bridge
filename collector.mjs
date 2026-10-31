@@ -1,6 +1,6 @@
 import { mkdir, writeFile, readFile, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
-
+import { createPlayerCollector } from "./player_enrichment.mjs";
 const API_BASE = "https://api.thestatsapi.com/api/football";
 const API_KEY = process.env.STATS_API_KEY;
 const TIMEZONE = "Europe/London";
@@ -34,7 +34,11 @@ const diagnostics = {
   duplicate_requests_avoided: 0,
   errors: []
 };
-
+const playerCollector = createPlayerCollector({
+  api,
+  fetchAll,
+  diagnostics
+});
 function londonDate() {
   const parts = new Intl.DateTimeFormat("en-GB", {
     timeZone: TIMEZONE,
@@ -402,11 +406,25 @@ for (let i = 0; i < uniqueDetailed.length; i += 3) {
         stats: detailedMap.get(String(row.id)) || null
       }))
       .filter(row => row.stats !== null);
-
-    return {
+const playerData = isBrentfordMatch
+  ? await playerCollector.collectForFixture(
       match,
-      state: "COMPLETE",
-      availability: {
+      homeHistory,
+      awayHistory
+    ).catch(error => ({
+      state: "UNRESOLVED",
+      reason: String(error?.message || error)
+    }))
+  : null;
+    return {
+  match,
+  state: "COMPLETE",
+  player_data: playerData,
+  player_data_scope: isBrentfordMatch
+    ? "BOTH_TEAMS_FULL_SQUADS"
+    : "NOT_REQUESTED",
+  availability: {
+
         odds: match?.odds_available === true,
         live_odds: match?.live_odds_available === true,
         xg: match?.xg_available === true
