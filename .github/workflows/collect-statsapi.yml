@@ -48,14 +48,22 @@ jobs:
           const event = process.env.GITHUB_EVENT_NAME;
           let run = true;
 
-          if (event === "schedule") {
-            const hour = new Intl.DateTimeFormat("en-GB", {
-              timeZone: "Europe/London",
-              hour: "2-digit",
-              hour12: false
-            }).format(new Date());
+                  if (event === "schedule") {
+            const cron = JSON.parse(
+              fs.readFileSync(process.env.GITHUB_EVENT_PATH, "utf8")
+            ).schedule;
 
-            run = hour === "03";
+            const londonOffset = new Intl.DateTimeFormat("en-GB", {
+              timeZone: "Europe/London",
+              timeZoneName: "shortOffset"
+            }).formatToParts(new Date())
+              .find(part => part.type === "timeZoneName")?.value;
+
+            run = cron === (
+              londonOffset === "GMT+1"
+                ? "0 2 * * *"
+                : "0 3 * * *"
+            );
           }
 
           fs.appendFileSync(
