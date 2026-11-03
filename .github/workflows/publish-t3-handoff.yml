@@ -10,6 +10,9 @@ on:
   push:
     paths:
       - "t3-shard-handoff.mjs"
+      # A completed collector writes this index. Trigger the small-file handoff
+      # automatically; t3 shard commits do not touch the index, so no loop.
+      - "data/latest.json"
 
 permissions:
   contents: write
