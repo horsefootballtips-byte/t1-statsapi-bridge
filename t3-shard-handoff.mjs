@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 
 const REPO_DATA = 'data';
 const MAX_BATCH_BYTES = 420_000; // comfortably below GitHub's 1 MB Contents limit
-const MAX_FIXTURES_PER_BATCH = 5;
+const MAX_FIXTURES_PER_BATCH = 5; // size limiter splits deeper 15-match history
 const bytes = value => Buffer.byteLength(JSON.stringify(value), 'utf8');
 const sha256 = raw => createHash('sha256').update(raw).digest('hex');
 const idOf = x => String(x?.id ?? '');
@@ -46,7 +46,7 @@ function compactFixture(match, enriched) {
     return {
       team_id: block.team_id ?? null,
       recent_matches: (Array.isArray(block.recent_matches) ? block.recent_matches : [])
-        .slice(0, 5).map(row => bound(row, 6000)),
+        .slice(0, 15).map(row => bound(row, 6000)),
       season_stats: bound(block.season_stats ?? null, 16000),
       detailed_stats: bound(block.detailed_stats ?? null, 8500)
     };
