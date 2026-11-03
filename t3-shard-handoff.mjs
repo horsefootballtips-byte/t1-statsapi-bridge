@@ -41,6 +41,8 @@ function bound(value, limit, depth = 0) {
 }
 
 function compactFixture(match, enriched) {
+  const isBrentford = [match?.home_team?.name, match?.away_team?.name,
+    match?.home_team_name, match?.away_team_name].some(name => /brentford/i.test(String(name || '')));
   const side = sideName => {
     const block = enriched?.[sideName] || {};
     return {
@@ -51,7 +53,7 @@ function compactFixture(match, enriched) {
       // A 5-row historical match stat array often exceeds 8.5 KB; that old cap
       // silently dropped 3-4 of the five rows. Keep all five source rows
       // subject to the unchanged 420 KB per-batch size/sha readback gate.
-      detailed_stats: bound(block.detailed_stats ?? null, 40000)
+      detailed_stats: bound(block.detailed_stats ?? null, isBrentford ? 110000 : 40000)
     };
   };
   const record = {
