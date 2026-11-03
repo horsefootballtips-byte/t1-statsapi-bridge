@@ -48,7 +48,10 @@ function compactFixture(match, enriched) {
       recent_matches: (Array.isArray(block.recent_matches) ? block.recent_matches : [])
         .slice(0, 15).map(row => bound(row, 6000)),
       season_stats: bound(block.season_stats ?? null, 16000),
-      detailed_stats: bound(block.detailed_stats ?? null, 8500)
+      // A 5-row historical match stat array often exceeds 8.5 KB; that old cap
+      // silently dropped 3-4 of the five rows. Keep all five source rows
+      // subject to the unchanged 420 KB per-batch size/sha readback gate.
+      detailed_stats: bound(block.detailed_stats ?? null, 40000)
     };
   };
   const record = {
