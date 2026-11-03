@@ -32,6 +32,8 @@ const diagnostics = {
   cache_hits: 0,
   cache_misses: 0,
   duplicate_requests_avoided: 0,
+  // Request headers only: no extra API calls and no account credentials stored.
+  api_quota_last_seen: null,
   errors: []
 };
 const playerCollector = createPlayerCollector({
@@ -104,6 +106,19 @@ async function api(path, params = {}, allow404 = false) {
         "User-Agent": "T5-GitHub-Collector/5.0"
       }
     });
+    // TheStatsAPI sends remaining monthly and per-minute budgets in headers.
+    // Record them for safe depth planning before increasing historical requests.
+    const quota = (name) => {
+      const value = response.headers.get(name);
+      return value === null ? null : /^-?\d+$/.test(value) ? Number(value) : null;
+    };
+    diagnostics.api_quota_last_seen = {
+      minute_remaining: quota("X-RateLimit-Remaining"),
+      minute_limit: quota("X-RateLimit-Limit"),
+      monthly_remaining: quota("X-Monthly-Quota-Remaining"),
+      monthly_limit: quota("X-Monthly-Quota-Limit")
+    };
+
 
     if (allow404 && response.status === 404) {
       return null;
