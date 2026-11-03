@@ -165,3 +165,17 @@ jobs:
         run: |
           echo "Football collection COMPLETE."
           echo "No continuation pass required."
+
+      # A push made with GITHUB_TOKEN does not trigger ordinary push workflows.
+      # Explicit workflow_dispatch is the supported way to hand off a verified
+      # completed source snapshot to the compact T3/F2/F3 batch publisher.
+      - name: Publish F2/F3 compact handoff from completed snapshot
+        if: >
+          steps.guard.outputs.run == 'true' &&
+          steps.state.outputs.state == 'COMPLETE'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          echo "Dispatching T3 handoff from validated collector index."
+          gh workflow run publish-t3-handoff.yml --ref main
