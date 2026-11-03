@@ -1,7 +1,7 @@
 # Matchcraft — TheStatsAPI F1 → F2 → F3 audit (3 November 2026)
 
 ## Scope and sources
-Read-only comparison of GitHub `collector.mjs`, `player_enrichment.mjs`, `t3-shard-handoff.mjs`, both GitHub Actions workflows, the connected Floot Matchcraft database and UI code, and the vendor's public endpoint documentation index. No paid API requests were made and no account secrets were accessed. The standalone `api.thestatsapi.com/llms.txt` link could not be directly downloaded here; endpoint identities were cross-checked against the vendor's public /docs/llms.txt and specific documentation pages. All estimates are uncalibrated until separately tested against historical outcomes.
+Read-only comparison of GitHub `collector.mjs`, `player_enrichment.mjs`, `t3-shard-handoff.mjs`, both GitHub Actions workflows, the connected Floot Matchcraft database and UI code, and the vendor's public endpoint documentation index. No paid API requests were made and no account secrets were accessed. The complete `https://api.thestatsapi.com/llms.txt` reference (365,590 characters, HTTP 200) was fetched and read directly through a read-only test environment. It advertises 34 feature endpoints across six groups; the document additionally lists an alternative v2 player-odds route and a health route. All estimates are uncalibrated until separately tested against historical outcomes.
 
 ## Confirmed current state
 - Github T5 data/latest.json says 2026-11-03 COMPLETE/VALIDATED, **85 fixtures**; full source file ~33.6 MB.
@@ -43,3 +43,15 @@ The nine called API families: `/competitions`, `/matches`, `/teams/{id}/stats`, 
 - Verify 5/10/15 controls use only observed pre-match data, correctly indicate when detailed stats are not available, and never silently show unsubstantiated percentages.
 - Verify F2/F3 import completed genuine **pre-kickoff** modelled fixtures, qualifying picks, and supported specials separately; preserve previously stored packs and bets.
 - Audit real quota headers and competition-season coverage before adding broad historical stats, referee data and v2 player odds.
+
+
+## Verified isolated integration tests (no paid API calls)
+- 3 November 2026: full **85/85** fixture data, 17 generated compact batches, largest **225,929 bytes**, all fixture IDs unique, source SHA256 **4521975659d3461f9e9cd827a5d03ae67415a54ed32c2a961a6a2f427fa07cc1** matched.
+- 31 October 2026: **422/422** fixtures, 85 generated batches, largest **148,713 bytes**, no duplicate/missing fixture IDs.
+- Verified independent player sidecar `data/2026-10-31.players.json` against the 31 October source SHA256, source fixture match ID, pre-kickoff capture time and squad coverage. Sidecar **969,157 bytes**, player data for one Brentford fixture, timestamp before kickoff. After deliberately corrupting the sidecar's claimed source SHA256, manifest set player_evidence.state=REJECTED and excluded it.
+- No standalone player file for 3 November; manifest correctly says NOT_AVAILABLE.
+- Updated collector syntax check passed. Real 3 November 85/85 source passed stricter per-row COMPLETE validation; synthetic 2-row snapshot with one PARTIAL was rejected, then passed when corrected.
+- Synthetic monthly 429 USAGE_LIMIT_EXCEEDED test stopped immediately rather than sleeping for a fake six-figure Retry-After; a second attempt made **no additional fetch**.
+- The collector now preserves successful checkpoint entries while retrying genuinely PARTIAL rows, and distinguishes a fully populated fixture manifest from fully successful per-fixture processing.
+
+**Deployment note:** These tests were isolated; they did not invoke the authenticated StatsAPI endpoint or run GitHub Actions on the live repository. GitHub Actions dispatch permissions and the production handover should still be observed after merging.
