@@ -24,7 +24,7 @@ Total | **34** | **9** | Not all 34 are needed by a prematch collector; use endp
 The nine called API families: `/competitions`, `/matches`, `/teams/{id}/stats`, `/matches/{id}/stats`, `/matches/{id}/odds`, `/players`, `/players/{id}/stats`, `/matches/{id}/player-stats`, `/matches/{id}/lineups`. The last three are Brentford-focused; the public API reference now specifies player-prop odds at `/v2/football/matches/{id}/odds/players`, not the deprecated v1 route.
 
 ## Concrete gaps and impact
-1. **Handoff automation missing:** `publish-t3-handoff.yml` is not triggered when `data/latest.json` changes. Only older October compact batches were present in the examined repository tree. A complete 33 MB snapshot exists, but downstream F2/F3 retrieval is brittle. The proposed workflow fix automatically rebuilds handoff batches when the index changes.
+1. **Handoff automation missing:** `publish-t3-handoff.yml` is not triggered when `data/latest.json` changes. Only older October compact batches were present in the examined repository tree. A complete 33 MB snapshot exists, but downstream F2/F3 retrieval is brittle. The proposed workflow fix explicitly dispatches the compact handoff workflow AFTER a verified collector COMPLETE state and checkpoint commit. GitHub Actions commits made with GITHUB_TOKEN do not normally trigger another workflow's push event.
 2. **15-game window loses evidence:** F1 `recentHistory` pulls up to 15 previous results per team, but detailed /stats are fetched for only **5** for most teams (**15** for Brentford). The old T3 shard script then trimmed `recent_matches` to 5. The proposed shard fix retains up to 15 match-result/history entries; it does **not** falsely claim to add missing advanced match statistics.
 3. **No generic player/referee enrichment:** F1 fetches per-player/lineups information only for Brentford fixtures; official referee tendencies, injuries, shotmaps and v2 player-prop bookmaker prices are not currently collected across the fixture universe. Extend incrementally using real coverage and availability flags, not fabricated values.
 4. **Timing:** The 07:00 F2 task ran a smaller fallback before the 85-fixture same-day GitHub pack was available. The 14:00 F3 task did not produce a verified new F3 selection upload. Completing F1 alone does not finish an F2/F3 shortlist.
@@ -32,13 +32,13 @@ The nine called API families: `/competitions`, `/matches`, `/teams/{id}/stats`, 
 6. **Model confidence:** Current MATCHCRAFT count and goal models estimate uncalibrated probabilities. Backtest by league, market, odds and 5/10/15 windows before promising predictive improvement.
 
 ## Staged changes in this review branch
-- Trigger compact T3 handoff on `data/latest.json` push; no recursive trigger from shard commits.
+- Explicitly dispatch compact T3 handoff on collector COMPLETE, using the existing Actions write permission; do not rely on GITHUB_TOKEN push triggering another workflow.
 - Increase retained T3 *recent result rows* from five to fifteen per team; existing byte-bounded batches and per-batch readbacks remain in force.
 - Capture API quota header counters in diagnostics; zero new provider requests.
 - No new player, card, referee or xG data is fabricated. No production workflow or Matchcraft publish is changed until branch is merged and separately verified.
 
 ## Validation/rollout checklist
-- On a **new completed** daily collector run, verify the T3 publisher runs and `data/t3/YYYY-MM-DD/manifest.json` is independently readable with complete source SHA256 and fixture count.
+- On a **new completed** daily collector run, verify the explicit workflow dispatch succeeds and the T3 publisher runs and `data/t3/YYYY-MM-DD/manifest.json` is independently readable with complete source SHA256 and fixture count.
 - Confirm all T3 batches together match the 85 fixture IDs (example 2026-11-03), and are each < 420 KB. Run the shard generator on a same-date local snapshot before deployment where possible.
 - Verify 5/10/15 controls use only observed pre-match data, correctly indicate when detailed stats are not available, and never silently show unsubstantiated percentages.
 - Verify F2/F3 import completed genuine **pre-kickoff** modelled fixtures, qualifying picks, and supported specials separately; preserve previously stored packs and bets.
