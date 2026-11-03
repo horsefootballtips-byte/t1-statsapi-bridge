@@ -10,6 +10,7 @@ const PASS_BUDGET_MS = Number(
 );
 
 const passStartedAt = Date.now();
+let monthlyQuotaExhausted = false;
 
 if (!API_KEY) {
   console.error("STATS_API_KEY is not configured.");
@@ -79,6 +80,7 @@ function routeFamily(path) {
 }
 
 async function api(path, params = {}, allow404 = false) {
+  if (monthlyQuotaExhausted) throw new Error('USAGE_LIMIT_EXCEEDED: Monthly API quota exhausted');
   const url = new URL(API_BASE + path);
 
   for (const [key, value] of Object.entries(params)) {
@@ -124,15 +126,24 @@ async function api(path, params = {}, allow404 = false) {
       return null;
     }
 
-    if (response.status === 429 && attempt < 3) {
+    if (response.status === 429) {
       diagnostics.rate_limit_events++;
-      diagnostics.retries++;
-
-      const retryAfter =
-        Number(response.headers.get("retry-after")) || 2;
-
-      await sleep(retryAfter * 1000);
-      continue;
+      const detail = await response.text();
+      let errorCode = '';
+      try { errorCode = JSON.parse(detail)?.error?.code || ''; } catch {}
+      if (errorCode === 'USAGE_LIMIT_EXCEEDED' || diagnostics.api_quota_last_seen?.monthly_remaining === 0) {
+        monthlyQuotaExhausted = true;
+        diagnostics.errors.push({ type: 'MONTHLY_QUOTA_EXHAUSTED', message: errorCode || 'Monthly quota remaining is 0' });
+        throw new Error('USAGE_LIMIT_EXCEEDED: Monthly API quota exhausted; do not retry until reset');
+      }
+      if (attempt < 3) {
+        diagnostics.retries++;
+        const retryAfter = Number(response.headers.get('retry-after'));
+        // Per-minute burst limit: bounded Retry-After, never a monthly reset wait.
+        await sleep((Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter, 120) : 2) * 1000);
+        continue;
+      }
+      throw new Error('StatsAPI HTTP 429: ' + detail.slice(0, 250));
     }
 
     if (response.status >= 500 && attempt < 3) {
@@ -570,6 +581,7 @@ async function validateFinalSnapshot(
 
     actual_enriched_count:
       enriched.length,
+    incomplete_enriched_count: enriched.filter(row => row?.state !== 'COMPLETE').length,
 
     unique_fixture_count:
       uniqueFixtureIds.size,
@@ -596,6 +608,7 @@ async function validateFinalSnapshot(
     expectedFixtures > 0 &&
     fixtures.length === expectedFixtures &&
     enriched.length === expectedEnriched &&
+    validation.incomplete_enriched_count === 0 &&
     expectedEnriched === expectedFixtures &&
     fixtureIds.length === fixtures.length &&
     uniqueFixtureIds.size === fixtures.length &&
@@ -719,6 +732,7 @@ async function collectDate(date, competitions) {
   const enriched =
     Array.isArray(previous?.enriched_fixtures)
       ? previous.enriched_fixtures.filter(row =>
+          row?.state === 'COMPLETE' &&
           fixtureIds.has(
             String(row?.match?.id || "")
           )
@@ -816,6 +830,21 @@ async function collectDate(date, competitions) {
       `Progress ${date}: ` +
       `${enriched.length}/${candidates.length}`
     );
+  }
+
+  // A counted row is not necessarily successfully enriched. Never promote
+  // a failed fixture as complete merely because its ID is present.
+  const incomplete = enriched.filter(row => row?.state !== "COMPLETE");
+  if (incomplete.length) {
+    await saveCheckpoint(date, competitions, fixtures, enriched, "CONTINUATION_REQUIRED");
+    console.log("CONTINUATION_REQUIRED: " + incomplete.length + " fixtures need retry");
+    return {
+      complete: false,
+      fixture_count: fixtures.length,
+      candidate_count: candidates.length,
+      enriched_count: enriched.filter(row => row?.state === "COMPLETE").length,
+      manifest_reconciliation: manifestReconciliation
+    };
   }
 
   const snapshot = {
