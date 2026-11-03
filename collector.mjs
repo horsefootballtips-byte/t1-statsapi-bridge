@@ -442,6 +442,9 @@ const playerData = isBrentfordMatch
       reason: String(error?.message || error)
     }))
   : null;
+    if (monthlyQuotaExhausted) {
+      throw new Error("USAGE_LIMIT_EXCEEDED: Full fixture enrichment cannot be trusted");
+    }
     return {
   match,
   state: "COMPLETE",
