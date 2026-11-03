@@ -67,6 +67,41 @@ function compactFixture(match, enriched) {
   return record;
 }
 
+/** Optional independent Brentford player sidecar; never treat post-off data as pre-match evidence. */
+async function checkPlayerEvidence(date, sourceHash, fixtureIds) {
+  const path = REPO_DATA + '/' + date + '.players.json';
+  let raw;
+  try { raw = await readFile(path, 'utf8'); }
+  catch (error) {
+    if (error?.code === 'ENOENT') return { state: 'NOT_AVAILABLE', path: null, match_ids: [] };
+    throw error;
+  }
+  const fail = reason => ({ state: 'REJECTED', path: null, match_ids: [], reason });
+  let data;
+  try { data = JSON.parse(raw); } catch { return fail('Invalid JSON'); }
+  if (data?.operating_date !== date || data?.source_sha256 !== sourceHash ||
+      !Array.isArray(data?.fixtures)) return fail('Source date/hash or fixture list mismatch');
+  const ids = [];
+  const captured = Date.parse(data.generated_at_utc);
+  if (!Number.isFinite(captured)) return fail('Missing capture time');
+  for (const item of data.fixtures) {
+    const id = String(item?.match_id ?? '');
+    const player = item?.player_data;
+    const kickoff = Date.parse(player?.kickoff_utc);
+    if (!fixtureIds.includes(id) || String(player?.target_match_id ?? '') !== id ||
+        player?.state !== 'COLLECTED' || player?.sampled_before_kickoff !== true ||
+        !Number.isFinite(kickoff) || captured >= kickoff ||
+        !(player?.coverage?.home_squad > 0) || !(player?.coverage?.away_squad > 0) ||
+        ids.includes(id)) return fail('Unverified or post-kickoff player evidence for ' + id);
+    ids.push(id);
+  }
+  return { state: ids.length ? 'VERIFIED_PREKICKOFF' : 'NOT_AVAILABLE',
+    path: ids.length ? path : null, match_ids: ids,
+    ...(ids.length ? { size_bytes: Buffer.byteLength(raw, 'utf8'),
+      sha256: sha256(raw), captured_at_utc: data.generated_at_utc,
+      source_snapshot_sha256: sourceHash } : {}) };
+}
+
 async function publishOne(date) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw Error('Invalid date: ' + date);
   const sourcePath = REPO_DATA + '/' + date + '.json';
@@ -130,6 +165,7 @@ async function publishOne(date) {
   }
   await flush();
   const sourceHash = sha256(sourceRaw);
+  const playerEvidence = await checkPlayerEvidence(date, sourceHash, fixtureIds);
   const manifest = {
     schema: 'T5_T3_SHARDED_MANIFEST_V1',
     operating_date: date,
@@ -143,6 +179,7 @@ async function publishOne(date) {
     fixture_count: fixtures.length,
     batch_count: batches.length,
     max_batch_bytes: MAX_BATCH_BYTES,
+    player_evidence: playerEvidence,
     evidence_policy: 'Source facts preserved in compact bounded form; original full snapshot available for forensic readback. Never infer missing facts.',
     batch_files: batches
   };
