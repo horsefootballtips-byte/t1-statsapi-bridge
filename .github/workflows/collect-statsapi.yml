@@ -14,6 +14,11 @@ on:
     # ensures only the correct one actually performs collection.
     - cron: "0 2 * * *"
     - cron: "0 3 * * *"
+    # Backup at 05:15 London time. Some GitHub scheduled runs can be
+    # delayed or omitted; collector validates and reuses an existing complete
+    # snapshot, with no extra detailed match-stat requests on the same date.
+    - cron: "15 4 * * *"
+    - cron: "15 5 * * *"
 
 permissions:
   contents: write
@@ -59,11 +64,10 @@ jobs:
             }).formatToParts(new Date())
               .find(part => part.type === "timeZoneName")?.value;
 
-            run = cron === (
-              londonOffset === "GMT+1"
-                ? "0 2 * * *"
-                : "0 3 * * *"
-            );
+            const allowed = londonOffset === "GMT+1"
+              ? ["0 2 * * *", "15 4 * * *"]
+              : ["0 3 * * *", "15 5 * * *"];
+            run = allowed.includes(cron);
           }
 
           fs.appendFileSync(
