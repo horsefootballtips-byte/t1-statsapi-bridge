@@ -67,7 +67,17 @@ jobs:
             const allowed = londonOffset === "GMT+1"
               ? ["0 2 * * *", "15 4 * * *"]
               : ["0 3 * * *", "15 5 * * *"];
-            run = allowed.includes(cron);
+            // GitHub Actions can dispatch a cron many hours late. An
+            // off-season UTC cron should not start collection at 02:00
+            // local, but if that same scheduled job only reaches us
+            // after 04:00 local it may rescue a skipped main run.
+            // The collector revalidates same-day COMPLETE snapshots,
+            // and its repository concurrency gate prevents overlaps.
+            const londonHour = Number(new Intl.DateTimeFormat("en-GB", {
+              timeZone: "Europe/London", hour: "2-digit", hourCycle: "h23"
+            }).format(new Date()));
+            const lateRecovery = londonHour >= 4 && londonHour <= 20;
+            run = allowed.includes(cron) || lateRecovery;
           }
 
           fs.appendFileSync(
