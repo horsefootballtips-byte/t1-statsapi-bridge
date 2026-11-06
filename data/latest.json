@@ -1,6 +1,6 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-11-06T03:23:07.311Z",
+  "generated_at_utc": "2026-11-06T03:49:04.402Z",
   "base_operating_date": "2026-11-06",
   "state": "CONTINUATION_REQUIRED",
   "outputs": [
@@ -32,7 +32,7 @@
       "operating_date": "2026-11-07",
       "filename": "data/2026-11-07.checkpoint.json",
       "fixture_count": 418,
-      "enriched_count": 80,
+      "enriched_count": 284,
       "state": "CONTINUATION_REQUIRED"
     }
   ]
