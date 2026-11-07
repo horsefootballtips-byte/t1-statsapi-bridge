@@ -118,7 +118,7 @@ jobs:
 
           fs.appendFileSync(
             process.env.GITHUB_OUTPUT,
-            `date=${latest.base_operating_date}\n`
+            `date=${latest.outputs?.find(output => output.state === "CONTINUATION_REQUIRED")?.operating_date || latest.base_operating_date}\n`
           );
 
           console.log(`Collection state: ${state}`);
