@@ -915,14 +915,7 @@ async function main() {
   const competitions =
     await fetchAll("/competitions");
 
-  const dates =
-    isFriday(baseDate)
-      ? [
-          baseDate,
-          addDays(baseDate, 1),
-          addDays(baseDate, 2)
-        ]
-      : [baseDate];
+  const dates = [baseDate, addDays(baseDate, 1), addDays(baseDate, 2)];
 
   const outputIndex = [];
   let continuationRequired = false;
