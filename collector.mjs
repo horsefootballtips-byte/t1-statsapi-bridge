@@ -670,7 +670,7 @@ async function saveCheckpoint(
 
   await writeFile(
     filename,
-    JSON.stringify(payload, null, 2) + "\n",
+    JSON.stringify(payload) + "\n",
     "utf8"
   );
 
@@ -1069,11 +1069,7 @@ async function main() {
      */
     await writeFile(
       filename,
-      JSON.stringify(
-        result.snapshot,
-        null,
-        2
-      ) + "\n",
+      JSON.stringify(result.snapshot) + "\n",
       "utf8"
     );
 
