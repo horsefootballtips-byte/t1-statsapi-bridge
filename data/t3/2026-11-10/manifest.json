@@ -16,9 +16,15 @@
   "batch_count": 11,
   "max_batch_bytes": 420000,
   "player_evidence": {
-    "state": "NOT_AVAILABLE",
-    "path": null,
-    "match_ids": []
+    "state": "VERIFIED_PREKICKOFF",
+    "path": "data/2026-11-10.players.json",
+    "match_ids": [
+      "mt_024340782"
+    ],
+    "size_bytes": 1403727,
+    "sha256": "b0fe0d7ee43ce13d508aa4a75a6434ea4b53105a1881db6585ae94a83b51ae17",
+    "captured_at_utc": "2026-11-08T08:09:50.408Z",
+    "source_snapshot_sha256": "4fbb6be27a11a0122336da565579a5cfb866324d85686360408aa6bd2f75c7fa"
   },
   "evidence_policy": "Source facts preserved in compact bounded form; original full snapshot available for forensic readback. Never infer missing facts.",
   "batch_files": [
