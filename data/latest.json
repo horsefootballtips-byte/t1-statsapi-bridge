@@ -1,33 +1,9 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-11-09T14:01:40.846Z",
-  "base_operating_date": "2026-11-09",
+  "generated_at_utc": "2026-11-10T03:12:03.828Z",
+  "base_operating_date": "2026-11-10",
   "state": "COMPLETE",
   "outputs": [
-    {
-      "operating_date": "2026-11-09",
-      "filename": "data/2026-11-09.json",
-      "fixture_count": 23,
-      "enriched_count": 23,
-      "state": "COMPLETE",
-      "validation": {
-        "schema_ok": true,
-        "operating_date_ok": true,
-        "snapshot_state_ok": true,
-        "expected_fixture_count": 23,
-        "actual_fixture_count": 23,
-        "expected_enriched_count": 23,
-        "actual_enriched_count": 23,
-        "incomplete_enriched_count": 0,
-        "unique_fixture_count": 23,
-        "unique_enriched_count": 23,
-        "missing_team_count": 0,
-        "orphan_enriched_count": 0,
-        "byte_size": 2003412,
-        "sha256": "c278a9f4339c5e1a6acb2977f61765de4840a7b8e11b450b4afa520136765b99",
-        "state": "VALIDATED"
-      }
-    },
     {
       "operating_date": "2026-11-10",
       "filename": "data/2026-11-10.json",
@@ -73,6 +49,30 @@
         "orphan_enriched_count": 0,
         "byte_size": 1145804,
         "sha256": "b4cebcce5ffc1f1e56b842c50a866e950445b9dceece017f650416838c87c25d",
+        "state": "VALIDATED"
+      }
+    },
+    {
+      "operating_date": "2026-11-12",
+      "filename": "data/2026-11-12.json",
+      "fixture_count": 48,
+      "enriched_count": 48,
+      "state": "COMPLETE",
+      "validation": {
+        "schema_ok": true,
+        "operating_date_ok": true,
+        "snapshot_state_ok": true,
+        "expected_fixture_count": 48,
+        "actual_fixture_count": 48,
+        "expected_enriched_count": 48,
+        "actual_enriched_count": 48,
+        "incomplete_enriched_count": 0,
+        "unique_fixture_count": 48,
+        "unique_enriched_count": 48,
+        "missing_team_count": 0,
+        "orphan_enriched_count": 0,
+        "byte_size": 3516286,
+        "sha256": "c7a32669919517319cbcbc8d272aa80fc3c4f281de76445cc1ae57ad3aa38894",
         "state": "VALIDATED"
       }
     }
