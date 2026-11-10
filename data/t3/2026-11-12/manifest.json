@@ -1,0 +1,164 @@
+{
+  "schema": "T5_T3_SHARDED_MANIFEST_V1",
+  "operating_date": "2026-11-12",
+  "state": "COMPLETE",
+  "T3_READY": true,
+  "source_schema": "T5_STATSAPI_GITHUB_SNAPSHOT_V4",
+  "source_snapshot": {
+    "path": "data/2026-11-12.json",
+    "size_bytes": 3516286,
+    "sha256": "c7a32669919517319cbcbc8d272aa80fc3c4f281de76445cc1ae57ad3aa38894"
+  },
+  "source_fixtures": 48,
+  "source_enriched": 48,
+  "published_fixtures": 48,
+  "fixture_count": 48,
+  "batch_count": 10,
+  "max_batch_bytes": 420000,
+  "player_evidence": {
+    "state": "NOT_AVAILABLE",
+    "path": null,
+    "match_ids": []
+  },
+  "evidence_policy": "Source facts preserved in compact bounded form; original full snapshot available for forensic readback. Never infer missing facts.",
+  "batch_files": [
+    {
+      "number": 1,
+      "path": "data/t3/2026-11-12/batch-0001.json",
+      "size_bytes": 355129,
+      "sha256": "f266c702ae538bdab143e3d76ceac122527299849322250fd1e08af67e9d573c",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_371361601",
+        "mt_468891410",
+        "mt_982811767",
+        "mt_468140081",
+        "mt_207850682"
+      ]
+    },
+    {
+      "number": 2,
+      "path": "data/t3/2026-11-12/batch-0002.json",
+      "size_bytes": 344919,
+      "sha256": "5d5708e3eff64324c6656e4340543bf0d5abbb658b762f4fb108975c1bd3a4f3",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_156646001",
+        "mt_518877918",
+        "mt_518864936",
+        "mt_518864925",
+        "mt_893320677"
+      ]
+    },
+    {
+      "number": 3,
+      "path": "data/t3/2026-11-12/batch-0003.json",
+      "size_bytes": 333460,
+      "sha256": "6b5d8599596512dddb0318b5d77219d1cb3967bc77d6394a2387b83d43b46c3a",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_642289509",
+        "mt_159946735",
+        "mt_207838339",
+        "mt_468198624",
+        "mt_735015426"
+      ]
+    },
+    {
+      "number": 4,
+      "path": "data/t3/2026-11-12/batch-0004.json",
+      "size_bytes": 256336,
+      "sha256": "edcb84768fb35941621b66152ee36b35ffabd47b6f50cd700b186c8910be4523",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_649589162",
+        "mt_649985654",
+        "mt_156646097",
+        "mt_156011053",
+        "mt_649649934"
+      ]
+    },
+    {
+      "number": 5,
+      "path": "data/t3/2026-11-12/batch-0005.json",
+      "size_bytes": 276031,
+      "sha256": "371aedde268ca43d9133b26f4644bc38a4292ac4d154c2a7873ec40adc42d5c9",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_735637030",
+        "mt_371403065",
+        "mt_514122871",
+        "mt_207066599",
+        "mt_156500934"
+      ]
+    },
+    {
+      "number": 6,
+      "path": "data/t3/2026-11-12/batch-0006.json",
+      "size_bytes": 276768,
+      "sha256": "5d6fe0d23654f761793aa69c5e8c5134787aae024abc23ee969dc2a52745c28a",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_890955327",
+        "mt_649433289",
+        "mt_890248230",
+        "mt_468478621",
+        "mt_890890568"
+      ]
+    },
+    {
+      "number": 7,
+      "path": "data/t3/2026-11-12/batch-0007.json",
+      "size_bytes": 290796,
+      "sha256": "bb75e04f5b39609b35e40468cd64a30a0155e71f495edeed35b42f63bb6b7a52",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_023087817",
+        "mt_514568821",
+        "mt_159946144",
+        "mt_205537857",
+        "mt_735015997"
+      ]
+    },
+    {
+      "number": 8,
+      "path": "data/t3/2026-11-12/batch-0008.json",
+      "size_bytes": 248073,
+      "sha256": "4e61a136841431f11976f5d5fc218144c9227b8a0e3af5f3fa7289e8bca67fda",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_982402760",
+        "mt_207837921",
+        "mt_371274188",
+        "mt_023973807",
+        "mt_156168867"
+      ]
+    },
+    {
+      "number": 9,
+      "path": "data/t3/2026-11-12/batch-0009.json",
+      "size_bytes": 193229,
+      "sha256": "b95662a148370055f7a15ec38a18cd1d8b2792614b452dcbb1d2255094d75188",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_890890507",
+        "mt_982131420",
+        "mt_468259959",
+        "mt_156841164",
+        "mt_982309916"
+      ]
+    },
+    {
+      "number": 10,
+      "path": "data/t3/2026-11-12/batch-0010.json",
+      "size_bytes": 166841,
+      "sha256": "912732d086944561318f43fc9fb18bcaa215d5f6db3cea8c3fa6a331e7df6d12",
+      "fixture_count": 3,
+      "fixture_ids": [
+        "mt_156841151",
+        "mt_649086643",
+        "mt_514576775"
+      ]
+    }
+  ]
+}
