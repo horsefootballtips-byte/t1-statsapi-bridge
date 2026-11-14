@@ -723,8 +723,16 @@ async function collectDate(date, competitions) {
   const checkpointFile =
     `data/${date}.checkpoint.json`;
 
-  const previous =
+  const checkpoint =
     await readJsonIfExists(checkpointFile);
+
+  // A prior-day COMPLETE checkpoint is not fresh evidence. Re-enrich
+  // from today\'s source discovery; incomplete checkpoints remain
+  // resumable across midnight and are never discarded.
+  const previous = checkpoint?.state === "COMPLETE" &&
+    checkpoint?.generated_at_utc?.slice(0, 10) !== londonDate()
+      ? null
+      : checkpoint;
 
   const fixtureIds = new Set(
     fixtures
@@ -912,8 +920,9 @@ async function main() {
     recursive: true
   });
 
-  const competitions =
-    await fetchAll("/competitions");
+  // Fetch competition data only when actual enrichment is required.
+  // A same-day fully validated snapshot needs zero StatsAPI calls.
+  let competitions = null;
 
   const dates = [baseDate, addDays(baseDate, 1), addDays(baseDate, 2)];
 
@@ -938,6 +947,7 @@ async function main() {
      */
     if (
       existingFinal?.state === "COMPLETE" &&
+      existingFinal?.generated_at_utc?.slice(0, 10) === londonDate() &&
       existingFinal?.schema ===
         "T5_STATSAPI_GITHUB_SNAPSHOT_V4"
     ) {
@@ -1033,6 +1043,13 @@ async function main() {
       `Collecting StatsAPI data for ${date}`
     );
 
+    // Preserve the previous COMPLETE snapshot in Git history. Its
+    // SHA256 and changed fixture IDs are recorded on refresh below.
+    if (existingFinal?.state === "COMPLETE") {
+      console.log(`Refreshing stale COMPLETE snapshot ${date} from current StatsAPI evidence`);
+    }
+    if (!competitions) competitions = await fetchAll("/competitions");
+
     const result =
       await collectDate(
         date,
@@ -1085,6 +1102,47 @@ async function main() {
         result.fixture_count,
         result.enriched_count
       );
+
+    // Audit what changed, without deleting the previous committed
+    // source version. Git history retains the prior snapshot for rollback.
+    if (existingFinal?.state === "COMPLETE") {
+      const previousRaw = await readFile(existingFilename);
+      const oldById = new Map((existingFinal.fixtures || []).map(row => [String(row.id), row]));
+      const newById = new Map(result.snapshot.fixtures.map(row => [String(row.id), row]));
+      const oldEnriched = new Map((existingFinal.enriched_fixtures || []).map(row => [String(row.match?.id), row]));
+      const newEnriched = new Map(result.snapshot.enriched_fixtures.map(row => [String(row.match?.id), row]));
+      const changes = {
+        schema: "T5_DAILY_REFRESH_DIFF_V1",
+        operating_date: date,
+        refreshed_at_utc: new Date().toISOString(),
+        previous_generated_at_utc: existingFinal.generated_at_utc || null,
+        current_generated_at_utc: result.snapshot.generated_at_utc,
+        previous_source_sha256: createHash("sha256").update(previousRaw).digest("hex"),
+        current_source_sha256: validation.sha256,
+        previous_fixture_count: oldById.size,
+        current_fixture_count: newById.size,
+        added_fixture_ids: [...newById.keys()].filter(id => !oldById.has(id)),
+        removed_fixture_ids: [...oldById.keys()].filter(id => !newById.has(id)),
+        changed_fixture_ids: [...newById.keys()].filter(id =>
+          oldById.has(id) && JSON.stringify(newById.get(id)) !== JSON.stringify(oldById.get(id))
+        ),
+        changed_enrichment_ids: [...newEnriched.keys()].filter(id =>
+          oldEnriched.has(id) && JSON.stringify(newEnriched.get(id)) !== JSON.stringify(oldEnriched.get(id))
+        ),
+        missing_odds_ids: result.snapshot.enriched_fixtures.filter(row =>
+          !row.odds?.data?.bookmakers?.length
+        ).map(row => String(row.match?.id || "")),
+        unresolved_diagnostics_count: result.snapshot.diagnostics?.errors?.length || 0
+      };
+      const historyDir = `data/refresh-history/${date}`;
+      await mkdir(historyDir, { recursive: true });
+      await writeFile(
+        `${historyDir}/${londonDate()}.json`,
+        JSON.stringify(changes, null, 2) + "\n",
+        "utf8"
+      );
+      console.log(`Refresh diff saved for ${date}: ${changes.added_fixture_ids.length} added, ${changes.removed_fixture_ids.length} removed, ${changes.changed_fixture_ids.length} fixture changes`);
+    }
 
     outputIndex.push({
       operating_date: date,
