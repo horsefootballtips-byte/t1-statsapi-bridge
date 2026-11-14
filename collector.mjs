@@ -1048,6 +1048,9 @@ async function main() {
     if (existingFinal?.state === "COMPLETE") {
       console.log(`Refreshing stale COMPLETE snapshot ${date} from current StatsAPI evidence`);
     }
+    const previousSourceSha = existingFinal?.state === "COMPLETE"
+      ? createHash("sha256").update(await readFile(existingFilename)).digest("hex")
+      : null;
     if (!competitions) competitions = await fetchAll("/competitions");
 
     const result =
@@ -1106,7 +1109,6 @@ async function main() {
     // Audit what changed, without deleting the previous committed
     // source version. Git history retains the prior snapshot for rollback.
     if (existingFinal?.state === "COMPLETE") {
-      const previousRaw = await readFile(existingFilename);
       const oldById = new Map((existingFinal.fixtures || []).map(row => [String(row.id), row]));
       const newById = new Map(result.snapshot.fixtures.map(row => [String(row.id), row]));
       const oldEnriched = new Map((existingFinal.enriched_fixtures || []).map(row => [String(row.match?.id), row]));
@@ -1117,7 +1119,7 @@ async function main() {
         refreshed_at_utc: new Date().toISOString(),
         previous_generated_at_utc: existingFinal.generated_at_utc || null,
         current_generated_at_utc: result.snapshot.generated_at_utc,
-        previous_source_sha256: createHash("sha256").update(previousRaw).digest("hex"),
+        previous_source_sha256: previousSourceSha,
         current_source_sha256: validation.sha256,
         previous_fixture_count: oldById.size,
         current_fixture_count: newById.size,
