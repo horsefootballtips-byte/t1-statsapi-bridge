@@ -1,33 +1,9 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-11-14T12:17:51.084Z",
-  "base_operating_date": "2026-11-14",
+  "generated_at_utc": "2026-11-15T08:52:05.548Z",
+  "base_operating_date": "2026-11-15",
   "state": "COMPLETE",
   "outputs": [
-    {
-      "operating_date": "2026-11-14",
-      "filename": "data/2026-11-14.json",
-      "fixture_count": 276,
-      "enriched_count": 276,
-      "state": "COMPLETE",
-      "validation": {
-        "schema_ok": true,
-        "operating_date_ok": true,
-        "snapshot_state_ok": true,
-        "expected_fixture_count": 276,
-        "actual_fixture_count": 276,
-        "expected_enriched_count": 276,
-        "actual_enriched_count": 276,
-        "incomplete_enriched_count": 0,
-        "unique_fixture_count": 276,
-        "unique_enriched_count": 276,
-        "missing_team_count": 0,
-        "orphan_enriched_count": 0,
-        "byte_size": 24304674,
-        "sha256": "fd3278936929ab8ce3af2ffb218eeac1030b59ab9b25983690a81d0385c26605",
-        "state": "VALIDATED"
-      }
-    },
     {
       "operating_date": "2026-11-15",
       "filename": "data/2026-11-15.json",
@@ -47,8 +23,8 @@
         "unique_enriched_count": 127,
         "missing_team_count": 0,
         "orphan_enriched_count": 0,
-        "byte_size": 9071331,
-        "sha256": "68fb21a88588f33c4e1f02f538bdeb3cc4c42ddc4eae296b63ef6df07848ba82",
+        "byte_size": 10461905,
+        "sha256": "e33b54640c26064d078b02f3ec1b9f798ff45feee0abb90e9a6dc34b292917fb",
         "state": "VALIDATED"
       }
     },
@@ -71,8 +47,32 @@
         "unique_enriched_count": 33,
         "missing_team_count": 0,
         "orphan_enriched_count": 0,
-        "byte_size": 2455015,
-        "sha256": "e0a1a2d9c910b68a94cf17e1cb142c00e1e2577c3b1114b97ee3cbde22e1ec93",
+        "byte_size": 3451085,
+        "sha256": "9fe46f68702b1b7f02277372065a89830b45bf4ecaacc8b52ff87d0147144bff",
+        "state": "VALIDATED"
+      }
+    },
+    {
+      "operating_date": "2026-11-17",
+      "filename": "data/2026-11-17.json",
+      "fixture_count": 67,
+      "enriched_count": 67,
+      "state": "COMPLETE",
+      "validation": {
+        "schema_ok": true,
+        "operating_date_ok": true,
+        "snapshot_state_ok": true,
+        "expected_fixture_count": 67,
+        "actual_fixture_count": 67,
+        "expected_enriched_count": 67,
+        "actual_enriched_count": 67,
+        "incomplete_enriched_count": 0,
+        "unique_fixture_count": 67,
+        "unique_enriched_count": 67,
+        "missing_team_count": 0,
+        "orphan_enriched_count": 0,
+        "byte_size": 4485563,
+        "sha256": "6be689fa930d3ce900c0853bbcb015a192226b3e662e0f2e51137f5b0e2047d9",
         "state": "VALIDATED"
       }
     }
