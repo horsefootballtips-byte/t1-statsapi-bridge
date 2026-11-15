@@ -6,8 +6,8 @@
   "source_schema": "T5_STATSAPI_GITHUB_SNAPSHOT_V4",
   "source_snapshot": {
     "path": "data/2026-11-15.json",
-    "size_bytes": 9071331,
-    "sha256": "68fb21a88588f33c4e1f02f538bdeb3cc4c42ddc4eae296b63ef6df07848ba82"
+    "size_bytes": 10461905,
+    "sha256": "e33b54640c26064d078b02f3ec1b9f798ff45feee0abb90e9a6dc34b292917fb"
   },
   "source_fixtures": 127,
   "source_enriched": 127,
@@ -25,8 +25,8 @@
     {
       "number": 1,
       "path": "data/t3/2026-11-15/batch-0001.json",
-      "size_bytes": 310815,
-      "sha256": "07aca153dc246b22a31badb28fb015d77c52f50a8532b0fbcab3219732332b8a",
+      "size_bytes": 315772,
+      "sha256": "4990d456ac8c4e74e1858f8109204d6de4404697b9ca52569b6f2b273cda355e",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_207297395",
@@ -39,8 +39,8 @@
     {
       "number": 2,
       "path": "data/t3/2026-11-15/batch-0002.json",
-      "size_bytes": 391706,
-      "sha256": "d899fb31daa5ce135c1d1dfb85a2d4c4214aa435d23b420c9394462dd8714787",
+      "size_bytes": 391705,
+      "sha256": "673629967d87d7843fc3aee244f5a957216abd7a9975a4fcf4fa096a1cb6bc38",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_468426487",
@@ -53,8 +53,8 @@
     {
       "number": 3,
       "path": "data/t3/2026-11-15/batch-0003.json",
-      "size_bytes": 354668,
-      "sha256": "36c57e4b78d1e368d973ed9356310714f2c4448328ff9276c36135922d58f973",
+      "size_bytes": 354660,
+      "sha256": "169ecea045e8ef50fc004d210016df751f09ae0caaadf0b52e1aedd651e431e8",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_734415024",
@@ -67,8 +67,8 @@
     {
       "number": 4,
       "path": "data/t3/2026-11-15/batch-0004.json",
-      "size_bytes": 343227,
-      "sha256": "f443330990305d2f48566ce5567a8c6c9e01fae30d4d821ee3bbbf34e097bbeb",
+      "size_bytes": 352616,
+      "sha256": "a445900e9e0b397afd60e57e3063e456cda27318306da004a6a60cafe3689eec",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_739421964",
@@ -81,8 +81,8 @@
     {
       "number": 5,
       "path": "data/t3/2026-11-15/batch-0005.json",
-      "size_bytes": 396507,
-      "sha256": "aa10e03141bcaace65f46106262c0f31163223f02dc2c988c04fcee976efda14",
+      "size_bytes": 396500,
+      "sha256": "9db46e5b64081f2c0bdf9cb1360fb8a0aae27b1b865c7ba5927a20a7660e97d4",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_460098285",
@@ -95,8 +95,8 @@
     {
       "number": 6,
       "path": "data/t3/2026-11-15/batch-0006.json",
-      "size_bytes": 377579,
-      "sha256": "61ac037d4d89f9e8137484aeb9757a4dfad8d569b39ab66b6f487f4867a5b2d2",
+      "size_bytes": 382331,
+      "sha256": "181493f98b9a59c86ce517775a29e5fc2d72f4e623bf73bd6e0c516bfe286300",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_467667740",
@@ -110,7 +110,7 @@
       "number": 7,
       "path": "data/t3/2026-11-15/batch-0007.json",
       "size_bytes": 302628,
-      "sha256": "c9af94bc2861492abd002638dafd17b6c78a3bc0f60b119fb363e6515d3c8e82",
+      "sha256": "f15426c08ceb617eff4109ac1e48ebe629b25e3e98eae9edc4c6df6d87dc7496",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_739421937",
@@ -123,8 +123,8 @@
     {
       "number": 8,
       "path": "data/t3/2026-11-15/batch-0008.json",
-      "size_bytes": 294197,
-      "sha256": "c6743392cb92e9ccd2d5cfe7ac6822ac5095ed713447712246679f2edc6f1570",
+      "size_bytes": 294179,
+      "sha256": "0956f526dc675018fa0771d64c193c12919ba4c0a9499a7d7bf96168d1cd46d2",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_377332014",
@@ -137,67 +137,67 @@
     {
       "number": 9,
       "path": "data/t3/2026-11-15/batch-0009.json",
-      "size_bytes": 229346,
-      "sha256": "6395db89d4a98fb48f686662f07082606a3098519a9299050a4033b0e434c35e",
+      "size_bytes": 286200,
+      "sha256": "d763e87c1ca3e5b34eb4fc20dd73320df76ffd08ca32943942df2399bb22a20d",
       "fixture_count": 5,
       "fixture_ids": [
-        "mt_371341786",
         "mt_982389320",
         "mt_023520941",
         "mt_150571044",
-        "mt_024290202"
+        "mt_024290202",
+        "mt_467006064"
       ]
     },
     {
       "number": 10,
       "path": "data/t3/2026-11-15/batch-0010.json",
-      "size_bytes": 323405,
-      "sha256": "bf278149514e152e1f5bcd98e2d5207125cb6cb1c31b5628e53fabbc2d3029fa",
+      "size_bytes": 319729,
+      "sha256": "6838b62734e0c5d310aadd6f022453e663564a8b95bfd251d8c20c0997aa8f8f",
       "fixture_count": 5,
       "fixture_ids": [
-        "mt_467006064",
         "mt_512881813",
         "mt_378568268",
         "mt_200228985",
-        "mt_642211049"
+        "mt_642211049",
+        "mt_021173074"
       ]
     },
     {
       "number": 11,
       "path": "data/t3/2026-11-15/batch-0011.json",
-      "size_bytes": 238075,
-      "sha256": "9ecc647f101dfcad4a7dcc715289ff5c5f9a6ebb68e112052dc044f30cf1c972",
+      "size_bytes": 241009,
+      "sha256": "87ff5b2435a92f26f79dac01d7e74beb6acf6b47fb382c051549508f4170f866",
       "fixture_count": 5,
       "fixture_ids": [
-        "mt_021173074",
         "mt_890798767",
         "mt_982389463",
         "mt_895990905",
-        "mt_024223237"
+        "mt_024223237",
+        "mt_206007007"
       ]
     },
     {
       "number": 12,
       "path": "data/t3/2026-11-15/batch-0012.json",
-      "size_bytes": 394615,
-      "sha256": "f7d553e6baf09b719cd2645b9be0e6f9f015d816ba4642775e79e56d423578ed",
+      "size_bytes": 394369,
+      "sha256": "566d798e24d3b9f6a1cc08a13fbd61f3d0d1ef80fb71b922a3ce84992920501b",
       "fixture_count": 5,
       "fixture_ids": [
-        "mt_206007007",
         "mt_150556956",
         "mt_378771605",
         "mt_895990467",
-        "mt_377275780"
+        "mt_377275780",
+        "mt_899890649"
       ]
     },
     {
       "number": 13,
       "path": "data/t3/2026-11-15/batch-0013.json",
-      "size_bytes": 96928,
-      "sha256": "52b01b5626ae0ef06f026ff48efba6cb421e9ee662f8c0afaf4f4953a31184d4",
+      "size_bytes": 40516,
+      "sha256": "ce35953b15d3b6a6ef7fcbf408decac56f79fdfbd52cfa73ef133e9f690410c6",
       "fixture_count": 5,
       "fixture_ids": [
-        "mt_899890649",
+        "mt_371341786",
         "mt_514583684",
         "mt_735637712",
         "mt_649046060",
@@ -249,8 +249,8 @@
     {
       "number": 17,
       "path": "data/t3/2026-11-15/batch-0017.json",
-      "size_bytes": 47978,
-      "sha256": "abc87d8e5f1cfbcec6b52d1cc03076feb9aed7a9f1ae4e20ba634deaa489b1e1",
+      "size_bytes": 47981,
+      "sha256": "3fc837dbcda73454d074e5fb50d4a3c37f65408af2d21b02f6371c0ec9c2c343",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_371473278",
@@ -263,8 +263,8 @@
     {
       "number": 18,
       "path": "data/t3/2026-11-15/batch-0018.json",
-      "size_bytes": 88921,
-      "sha256": "e2d0498cb9e52280536a7e9b46fd658ffba6c735c2a51de280ee58e6b1247239",
+      "size_bytes": 88906,
+      "sha256": "c92879eea270d0ed061a9e4d4b3c73e519a62db4d96fb457c6cd5db07a9525dd",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_156851797",
@@ -277,8 +277,8 @@
     {
       "number": 19,
       "path": "data/t3/2026-11-15/batch-0019.json",
-      "size_bytes": 254489,
-      "sha256": "a0828527175c427de52292eb287710c6ecd0847cf6eab7d6f0900f92615ecad5",
+      "size_bytes": 260127,
+      "sha256": "f6a798dff241a3e7245b0b58fe45d4ed0c5835fc245d5b4b40494197dac7b3ab",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_023947052",
@@ -291,8 +291,8 @@
     {
       "number": 20,
       "path": "data/t3/2026-11-15/batch-0020.json",
-      "size_bytes": 310812,
-      "sha256": "27d9f62870fb867e2a7243c25b32f55a05600994aae926623aec396de69c23c8",
+      "size_bytes": 310809,
+      "sha256": "3c57ab1d2d9e0c1c009c600ede4d5c6b4cab077422419c60acf1dc64fa92b021",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_649511690",
@@ -306,7 +306,7 @@
       "number": 21,
       "path": "data/t3/2026-11-15/batch-0021.json",
       "size_bytes": 318475,
-      "sha256": "54952b496ccdee251bedcf6a8b4edd92da0426d1505878e2df47b3cae9cafe36",
+      "sha256": "0d4b0c6652d908103fc72df18129f8c563376b5bc114d1f34caae97ffefbd9b8",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_739149036",
@@ -319,8 +319,8 @@
     {
       "number": 22,
       "path": "data/t3/2026-11-15/batch-0022.json",
-      "size_bytes": 283487,
-      "sha256": "15c8048c06dfc616d84764b220424abe30c0fe7a9caf119ddb5be05f7e2bcdd5",
+      "size_bytes": 283800,
+      "sha256": "7183e9e1fe11b15e7418c2dc0eab9e0559f3cd60b0b646cb60e8bf1df94b7363",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_644649511",
@@ -333,8 +333,8 @@
     {
       "number": 23,
       "path": "data/t3/2026-11-15/batch-0023.json",
-      "size_bytes": 327877,
-      "sha256": "f6e0b5a93475601dc5a92ff40672db39f86b665fe02b517e646122fd027bd355",
+      "size_bytes": 327785,
+      "sha256": "422409d130a518329c933057b17d7b9b70b4d7f9a5f0c53d6820dba977b2f662",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_200812386",
@@ -347,8 +347,8 @@
     {
       "number": 24,
       "path": "data/t3/2026-11-15/batch-0024.json",
-      "size_bytes": 271357,
-      "sha256": "38f85118e51877b29530b637960348b2c7cc82b029fd96d890f4ec1ff2942225",
+      "size_bytes": 271399,
+      "sha256": "2f7726e81df34f921ab0bfa158a8d57d26832b5e554170539e3b8b0ceeaa185e",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_988433208",
@@ -361,8 +361,8 @@
     {
       "number": 25,
       "path": "data/t3/2026-11-15/batch-0025.json",
-      "size_bytes": 322865,
-      "sha256": "11332369ed726064a242c90a2329ae485ae907c8cb079a554b254e43faad5222",
+      "size_bytes": 325370,
+      "sha256": "7cde11c7cc0dd5ae3f2743d44ca22ee2c59a0721a399ab528cfeee771ff90896",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_644500365",
@@ -375,8 +375,8 @@
     {
       "number": 26,
       "path": "data/t3/2026-11-15/batch-0026.json",
-      "size_bytes": 83274,
-      "sha256": "981ababbc23d8d2be1c30f7fe5a712211cc650a8014ca6960b10bf7c5fe67c2d",
+      "size_bytes": 92105,
+      "sha256": "68c4505cc5b5c53659a3afff5819fd689633a7e6b64c1ed0cd313c08b07ff520",
       "fixture_count": 2,
       "fixture_ids": [
         "mt_981329633",
