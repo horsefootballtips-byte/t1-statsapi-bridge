@@ -1,0 +1,60 @@
+{
+  "schema": "T5_DAILY_REFRESH_DIFF_V1",
+  "operating_date": "2026-11-16",
+  "refreshed_at_utc": "2026-11-16T08:46:13.288Z",
+  "previous_generated_at_utc": "2026-11-15T08:46:11.579Z",
+  "current_generated_at_utc": "2026-11-16T08:46:13.100Z",
+  "previous_source_sha256": "9fe46f68702b1b7f02277372065a89830b45bf4ecaacc8b52ff87d0147144bff",
+  "current_source_sha256": "da0a87a96353f8a3573eebe0081f4e059cd251bcca00cd9cb380c45ff490a886",
+  "previous_fixture_count": 33,
+  "current_fixture_count": 33,
+  "added_fixture_ids": [
+    "mt_208363358"
+  ],
+  "removed_fixture_ids": [
+    "mt_371323188"
+  ],
+  "changed_fixture_ids": [
+    "mt_156134705",
+    "mt_890883029",
+    "mt_890586253",
+    "mt_372565103",
+    "mt_896232542"
+  ],
+  "changed_enrichment_ids": [
+    "mt_156196931",
+    "mt_022394408",
+    "mt_988241139",
+    "mt_739335412",
+    "mt_893344797",
+    "mt_376651465",
+    "mt_376651453",
+    "mt_987702440",
+    "mt_642289532",
+    "mt_156134705",
+    "mt_206007071",
+    "mt_733713025",
+    "mt_207737673",
+    "mt_207737602",
+    "mt_982199188",
+    "mt_514533875",
+    "mt_156134514",
+    "mt_890883029",
+    "mt_890586253",
+    "mt_376600472",
+    "mt_518864596",
+    "mt_376651327",
+    "mt_890620346",
+    "mt_982402699",
+    "mt_372565103",
+    "mt_156746386",
+    "mt_642289610",
+    "mt_893320828",
+    "mt_514363661",
+    "mt_649589468",
+    "mt_514364877",
+    "mt_896232542"
+  ],
+  "missing_odds_ids": [],
+  "unresolved_diagnostics_count": 12
+}
