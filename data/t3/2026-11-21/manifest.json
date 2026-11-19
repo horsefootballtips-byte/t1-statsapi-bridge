@@ -1,0 +1,1174 @@
+{
+  "schema": "T5_T3_SHARDED_MANIFEST_V1",
+  "operating_date": "2026-11-21",
+  "state": "COMPLETE",
+  "T3_READY": true,
+  "source_schema": "T5_STATSAPI_GITHUB_SNAPSHOT_V4",
+  "source_snapshot": {
+    "path": "data/2026-11-21.json",
+    "size_bytes": 34461161,
+    "sha256": "585548f6b4bf81b09f0912592df09608be29b838f8e2382114c8d5a1c0ba4207"
+  },
+  "source_fixtures": 410,
+  "source_enriched": 410,
+  "published_fixtures": 410,
+  "fixture_count": 410,
+  "batch_count": 82,
+  "max_batch_bytes": 420000,
+  "player_evidence": {
+    "state": "NOT_AVAILABLE",
+    "path": null,
+    "match_ids": []
+  },
+  "evidence_policy": "Source facts preserved in compact bounded form; original full snapshot available for forensic readback. Never infer missing facts.",
+  "batch_files": [
+    {
+      "number": 1,
+      "path": "data/t3/2026-11-21/batch-0001.json",
+      "size_bytes": 407470,
+      "sha256": "fa5e979fbc001f83d4d55209479623cc39ec47ad77a0ec757393cf96006aa9ef",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_023401887",
+        "mt_153144698",
+        "mt_371323470",
+        "mt_899694443",
+        "mt_022928880"
+      ]
+    },
+    {
+      "number": 2,
+      "path": "data/t3/2026-11-21/batch-0002.json",
+      "size_bytes": 317351,
+      "sha256": "f84cf80e007ed2cdb85a957e0ae10133348d89250eba3f7dbf01507cc743c4b9",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_982484609",
+        "mt_512945866",
+        "mt_150861317",
+        "mt_156793967",
+        "mt_207978999"
+      ]
+    },
+    {
+      "number": 3,
+      "path": "data/t3/2026-11-21/batch-0003.json",
+      "size_bytes": 395320,
+      "sha256": "c34697edc2ab549936626bb0af5e66131444cb593f342f37a66bf187f7903e00",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_371836007",
+        "mt_649656048",
+        "mt_732711540",
+        "mt_649619863",
+        "mt_514353499"
+      ]
+    },
+    {
+      "number": 4,
+      "path": "data/t3/2026-11-21/batch-0004.json",
+      "size_bytes": 395657,
+      "sha256": "6f177b0e3b0a3b8c14e1ae2e0d1d76ef8d466f46e130ee7b0c466086e7f63738",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_894624974",
+        "mt_982939879",
+        "mt_023030729",
+        "mt_739421536",
+        "mt_643811518"
+      ]
+    },
+    {
+      "number": 5,
+      "path": "data/t3/2026-11-21/batch-0005.json",
+      "size_bytes": 396856,
+      "sha256": "8c8f0d557af9663eadc0ea714b74967ff465bab86fcf6bd1756e078d50ac4259",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_644680303",
+        "mt_022072942",
+        "mt_733616960",
+        "mt_155799438",
+        "mt_511388676"
+      ]
+    },
+    {
+      "number": 6,
+      "path": "data/t3/2026-11-21/batch-0006.json",
+      "size_bytes": 404055,
+      "sha256": "9b5a65a791ba2a21c66f5648aec750bee399392fbdbee3af4a281db150208c43",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_511938223",
+        "mt_733604994",
+        "mt_899632509",
+        "mt_466109789",
+        "mt_988470114"
+      ]
+    },
+    {
+      "number": 7,
+      "path": "data/t3/2026-11-21/batch-0007.json",
+      "size_bytes": 397856,
+      "sha256": "414d1f2dbf19faf7fb83691a6f7d5f0bbad45dce84cc3723f3dc26d83cc7b82e",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_200853667",
+        "mt_644908691",
+        "mt_649815090",
+        "mt_377365128",
+        "mt_465195681"
+      ]
+    },
+    {
+      "number": 8,
+      "path": "data/t3/2026-11-21/batch-0008.json",
+      "size_bytes": 396902,
+      "sha256": "bde61da9a716ac60d78b9eb444c95af43a1e2c598068efdd7187047d24313980",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_022910518",
+        "mt_514535919",
+        "mt_649362112",
+        "mt_649195804",
+        "mt_899755907"
+      ]
+    },
+    {
+      "number": 9,
+      "path": "data/t3/2026-11-21/batch-0009.json",
+      "size_bytes": 399943,
+      "sha256": "4fd01848af120542fa3ac4e427eda9b65c9c7c01814501a8e42917b3042a8ebf",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_200169821",
+        "mt_206555018",
+        "mt_511997591",
+        "mt_155865853",
+        "mt_207212051"
+      ]
+    },
+    {
+      "number": 10,
+      "path": "data/t3/2026-11-21/batch-0010.json",
+      "size_bytes": 342421,
+      "sha256": "2b6910171fde90e2b4521950834b7de3cee1f1feb23c64ca2cb9b7b344ce3d02",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_156717680",
+        "mt_200189982",
+        "mt_378605107",
+        "mt_022023917",
+        "mt_511514375"
+      ]
+    },
+    {
+      "number": 11,
+      "path": "data/t3/2026-11-21/batch-0011.json",
+      "size_bytes": 372246,
+      "sha256": "90d47299a7bc878461831bd204da914f248b800dc57ffe22a414b94055ed548d",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_988303149",
+        "mt_733044115",
+        "mt_377266557",
+        "mt_206963331",
+        "mt_024727887"
+      ]
+    },
+    {
+      "number": 12,
+      "path": "data/t3/2026-11-21/batch-0012.json",
+      "size_bytes": 398279,
+      "sha256": "ac1d82fd9f0d3a4c115b30a25a6c88aeaa453c2b99a9efd6b201f1ab25f33b08",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_733746342",
+        "mt_466492747",
+        "mt_377357271",
+        "mt_899753257",
+        "mt_988360414"
+      ]
+    },
+    {
+      "number": 13,
+      "path": "data/t3/2026-11-21/batch-0013.json",
+      "size_bytes": 361826,
+      "sha256": "5e23d05c9ddd525d82235d20a33f29d24826263d9f654770ea6ed1dbfa0c43d0",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_466294944",
+        "mt_512135261",
+        "mt_511938214",
+        "mt_029792152",
+        "mt_023905731"
+      ]
+    },
+    {
+      "number": 14,
+      "path": "data/t3/2026-11-21/batch-0014.json",
+      "size_bytes": 330936,
+      "sha256": "6a163dae2295c8e5363cd1209b3fbf5189794d555e67f8a33bcec2d6a3220c04",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_468951281",
+        "mt_514673942",
+        "mt_739657275",
+        "mt_150973788",
+        "mt_739190177"
+      ]
+    },
+    {
+      "number": 15,
+      "path": "data/t3/2026-11-21/batch-0015.json",
+      "size_bytes": 391189,
+      "sha256": "0f2eb7cb8aeb1b999a4173d6d9911b1ec762a9f39bbda3e5f0734c1c368ad5fc",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_150433730",
+        "mt_155793169",
+        "mt_466829489",
+        "mt_988222897",
+        "mt_153704474"
+      ]
+    },
+    {
+      "number": 16,
+      "path": "data/t3/2026-11-21/batch-0016.json",
+      "size_bytes": 398703,
+      "sha256": "76d74facad7e924550bb3892aa3f8f57d37729b9896511721386da3d32a68d25",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_022535089",
+        "mt_467668751",
+        "mt_024223202",
+        "mt_024223152",
+        "mt_739335495"
+      ]
+    },
+    {
+      "number": 17,
+      "path": "data/t3/2026-11-21/batch-0017.json",
+      "size_bytes": 391327,
+      "sha256": "94e105541e095c67ec7dc3abc0aa2ea52454e45cea1701e1cfd64d11df97c3a9",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_739339516",
+        "mt_378778151",
+        "mt_200100636",
+        "mt_733047640",
+        "mt_028933947"
+      ]
+    },
+    {
+      "number": 18,
+      "path": "data/t3/2026-11-21/batch-0018.json",
+      "size_bytes": 367974,
+      "sha256": "be1528c7f8edffe2294b2375efed1f6d203bc6a01d7b1406de8edff638365e1e",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_150999586",
+        "mt_644528391",
+        "mt_649560893",
+        "mt_981078491",
+        "mt_981068469"
+      ]
+    },
+    {
+      "number": 19,
+      "path": "data/t3/2026-11-21/batch-0019.json",
+      "size_bytes": 370834,
+      "sha256": "0c5b175445d27495ea8b559736a4ec242809b51170fffb6d8eb9fbd8f8d5048e",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_511954136",
+        "mt_200170105",
+        "mt_466286208",
+        "mt_155705776",
+        "mt_981123399"
+      ]
+    },
+    {
+      "number": 20,
+      "path": "data/t3/2026-11-21/batch-0020.json",
+      "size_bytes": 390507,
+      "sha256": "afc8548a9ba4ba3d2497417f2bafca03ed22c19f4ab9bbdfb4471ee73baafd0c",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_150580601",
+        "mt_895975056",
+        "mt_024187342",
+        "mt_206593791",
+        "mt_200119219"
+      ]
+    },
+    {
+      "number": 21,
+      "path": "data/t3/2026-11-21/batch-0021.json",
+      "size_bytes": 400405,
+      "sha256": "133b6844b950b6006cd3f5dd8570d9f188cf9b0e51a0e2149fdd6ef56fc6a26e",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_022927297",
+        "mt_155799447",
+        "mt_023230949",
+        "mt_733716966",
+        "mt_022072921"
+      ]
+    },
+    {
+      "number": 22,
+      "path": "data/t3/2026-11-21/batch-0022.json",
+      "size_bytes": 276283,
+      "sha256": "aa044ab74e2aacea3490c956578f09580e8c60c11c83ce0be6a5738fd0ab1c27",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_899086602",
+        "mt_890687206",
+        "mt_156733110",
+        "mt_895364670",
+        "mt_512647863"
+      ]
+    },
+    {
+      "number": 23,
+      "path": "data/t3/2026-11-21/batch-0023.json",
+      "size_bytes": 322398,
+      "sha256": "6be30fe8b545655809497ad3299ee2d98e26406db33ac2a71aab88b096887c37",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_981026702",
+        "mt_206379536",
+        "mt_150463945",
+        "mt_739152414",
+        "mt_378510655"
+      ]
+    },
+    {
+      "number": 24,
+      "path": "data/t3/2026-11-21/batch-0024.json",
+      "size_bytes": 319087,
+      "sha256": "a06244967b76086134147617062fa82bedc33d5453acbfe5ccd97f45b0c84399",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_643891166",
+        "mt_467985542",
+        "mt_024738809",
+        "mt_512647754",
+        "mt_981026691"
+      ]
+    },
+    {
+      "number": 25,
+      "path": "data/t3/2026-11-21/batch-0025.json",
+      "size_bytes": 328946,
+      "sha256": "64243c9cc6e9240299aefb205c3382f5485e6b87910f90625314558351ee5600",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_206379920",
+        "mt_378515728",
+        "mt_643898454",
+        "mt_467989610",
+        "mt_512646136"
+      ]
+    },
+    {
+      "number": 26,
+      "path": "data/t3/2026-11-21/batch-0026.json",
+      "size_bytes": 319215,
+      "sha256": "6b01d6f3ccf07bdda3317f96c7cb5619f11895568ba0dc1243a1d0d2ea1f1e9c",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_981020829",
+        "mt_206373071",
+        "mt_150464567",
+        "mt_739151355",
+        "mt_895202905"
+      ]
+    },
+    {
+      "number": 27,
+      "path": "data/t3/2026-11-21/batch-0027.json",
+      "size_bytes": 301206,
+      "sha256": "e6da2402b36e0d81032738c9a3b5f7af8baf62a1f91e75f449920eecf13090f4",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_378515717",
+        "mt_643898492",
+        "mt_467989685",
+        "mt_512616765",
+        "mt_981080603"
+      ]
+    },
+    {
+      "number": 28,
+      "path": "data/t3/2026-11-21/batch-0028.json",
+      "size_bytes": 274429,
+      "sha256": "4f85642b24ace9ea33e46be402869a48961eaafe6bf66a0ce030573284f8799e",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_206303938",
+        "mt_150454346",
+        "mt_739131219",
+        "mt_895292429",
+        "mt_378575056"
+      ]
+    },
+    {
+      "number": 29,
+      "path": "data/t3/2026-11-21/batch-0029.json",
+      "size_bytes": 345408,
+      "sha256": "5dcdb7963b982032773fc6a2ab325291b210c5db8f1ea46dd8f7e1f730953f23",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_643848181",
+        "mt_981066402",
+        "mt_899763554",
+        "mt_511937797",
+        "mt_988346630"
+      ]
+    },
+    {
+      "number": 30,
+      "path": "data/t3/2026-11-21/batch-0030.json",
+      "size_bytes": 351283,
+      "sha256": "a8d4cc7cbe044844bd604f470f92a9c319f27fafb54364b5bc6b06e285345843",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_155873378",
+        "mt_899764460",
+        "mt_988340649",
+        "mt_733601205",
+        "mt_377425027"
+      ]
+    },
+    {
+      "number": 31,
+      "path": "data/t3/2026-11-21/batch-0031.json",
+      "size_bytes": 361183,
+      "sha256": "c14503fe09ef8f063db05b376b19b4ed9a2952e6de00fbae04d6b6fda061bad7",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_644058152",
+        "mt_022597897",
+        "mt_988340623",
+        "mt_200183978",
+        "mt_377425016"
+      ]
+    },
+    {
+      "number": 32,
+      "path": "data/t3/2026-11-21/batch-0032.json",
+      "size_bytes": 358430,
+      "sha256": "a83304ebd8cd0b49e077222b9faec5896606ee5a42c7bffab416a4afbe6676f5",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_644058191",
+        "mt_466219589",
+        "mt_377413861",
+        "mt_644096323",
+        "mt_466284706"
+      ]
+    },
+    {
+      "number": 33,
+      "path": "data/t3/2026-11-21/batch-0033.json",
+      "size_bytes": 370008,
+      "sha256": "857d63c88eb11d42e7e85635b3b69dfb0d830f221612472a9f828cadc503c50d",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_022530411",
+        "mt_511945287",
+        "mt_988329170",
+        "mt_200172692",
+        "mt_155861038"
+      ]
+    },
+    {
+      "number": 34,
+      "path": "data/t3/2026-11-21/batch-0034.json",
+      "size_bytes": 398238,
+      "sha256": "55b905a1754d9decff32192f04ca16a97a4ffc9867c85343ff6c8130125c6104",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_733657920",
+        "mt_733653162",
+        "mt_899709272",
+        "mt_377417523",
+        "mt_644094850"
+      ]
+    },
+    {
+      "number": 35,
+      "path": "data/t3/2026-11-21/batch-0035.json",
+      "size_bytes": 403960,
+      "sha256": "1cedac8d580243dec4eb019b178c89b2de2a1e4f004ab30cec56102019bf9186",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_022532793",
+        "mt_200170385",
+        "mt_155865473",
+        "mt_899709208",
+        "mt_377486582"
+      ]
+    },
+    {
+      "number": 36,
+      "path": "data/t3/2026-11-21/batch-0036.json",
+      "size_bytes": 387109,
+      "sha256": "bee7ab53be49057ce7398db84863e44edf1ff1c3cd5c72aae0815663a7be5595",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_733692075",
+        "mt_899754685",
+        "mt_511976329",
+        "mt_899742653",
+        "mt_377405280"
+      ]
+    },
+    {
+      "number": 37,
+      "path": "data/t3/2026-11-21/batch-0037.json",
+      "size_bytes": 333252,
+      "sha256": "b950a9fa02d57ab615600936e5e920d78bbef688a66ab40e7effeea0293af6e7",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_466259164",
+        "mt_022587925",
+        "mt_511965164",
+        "mt_988309801",
+        "mt_200132030"
+      ]
+    },
+    {
+      "number": 38,
+      "path": "data/t3/2026-11-21/batch-0038.json",
+      "size_bytes": 304536,
+      "sha256": "9dc836953d96305bc3bbe3591a5f4950657e057d5c60fe7ca446fb06ed1145d0",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_155841549",
+        "mt_733617312",
+        "mt_733617213",
+        "mt_899728423",
+        "mt_644086188"
+      ]
+    },
+    {
+      "number": 39,
+      "path": "data/t3/2026-11-21/batch-0039.json",
+      "size_bytes": 333447,
+      "sha256": "6d1a5009a077ae679ed0dc4c87d717162d7fc199b524450cb3793937356aa7bb",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_511965653",
+        "mt_644080045",
+        "mt_022575524",
+        "mt_988303387",
+        "mt_155848854"
+      ]
+    },
+    {
+      "number": 40,
+      "path": "data/t3/2026-11-21/batch-0040.json",
+      "size_bytes": 407063,
+      "sha256": "018e1ccca161a3dd237e0ba25e365ba24ce5e3615c4845c6b945a780be110f03",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_899727570",
+        "mt_644080304",
+        "mt_466292720",
+        "mt_511969296",
+        "mt_641688924"
+      ]
+    },
+    {
+      "number": 41,
+      "path": "data/t3/2026-11-21/batch-0041.json",
+      "size_bytes": 361054,
+      "sha256": "8c261124147489841c08e4c75a6f8f1510373fd2ea61fcd8e5a00bcdaa5b5ad7",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_641538899",
+        "mt_156161903",
+        "mt_644620410",
+        "mt_466402651",
+        "mt_511589172"
+      ]
+    },
+    {
+      "number": 42,
+      "path": "data/t3/2026-11-21/batch-0042.json",
+      "size_bytes": 368933,
+      "sha256": "8f7654eab09b1f49a37e8a402dd0d9bae49f7ec654553ad5d17b18ed877901c1",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_988973868",
+        "mt_899837928",
+        "mt_899785455",
+        "mt_988391683",
+        "mt_377438076"
+      ]
+    },
+    {
+      "number": 43,
+      "path": "data/t3/2026-11-21/batch-0043.json",
+      "size_bytes": 349944,
+      "sha256": "3356f7b8312a616e7fdaffd72e36434e9384d36e6cd26bf2a1016cd1b074bc38",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_644090616",
+        "mt_511972316",
+        "mt_988361479",
+        "mt_155830797",
+        "mt_511387544"
+      ]
+    },
+    {
+      "number": 44,
+      "path": "data/t3/2026-11-21/batch-0044.json",
+      "size_bytes": 297234,
+      "sha256": "d8e431b37ecc79c93374deecd640808bba6463a8e221506ee1db18caad26d9e3",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_200859270",
+        "mt_377260383",
+        "mt_735070579",
+        "mt_468677979",
+        "mt_895725448"
+      ]
+    },
+    {
+      "number": 45,
+      "path": "data/t3/2026-11-21/batch-0045.json",
+      "size_bytes": 345534,
+      "sha256": "f52c518ad3f2014669eeaf3a5dd2c3e04561a55f09086e411f036f17c209a9a7",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_378458004",
+        "mt_643251563",
+        "mt_512881829",
+        "mt_024111207",
+        "mt_512888195"
+      ]
+    },
+    {
+      "number": 46,
+      "path": "data/t3/2026-11-21/batch-0046.json",
+      "size_bytes": 396208,
+      "sha256": "e34f3c95b9b6585d5c79339d33418cc3f2d850bdbda906ead8627d8c87cf5700",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_981777833",
+        "mt_739444369",
+        "mt_378666746",
+        "mt_150407344",
+        "mt_378582532"
+      ]
+    },
+    {
+      "number": 47,
+      "path": "data/t3/2026-11-21/batch-0047.json",
+      "size_bytes": 386611,
+      "sha256": "c5f02ba51d16f829878f419d62f970e6060800cf1c30016aa8f9db01627ac73a",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_024749702",
+        "mt_512623658",
+        "mt_377477855",
+        "mt_644534502",
+        "mt_466169592"
+      ]
+    },
+    {
+      "number": 48,
+      "path": "data/t3/2026-11-21/batch-0048.json",
+      "size_bytes": 404510,
+      "sha256": "22ba511b0d281002735754199746cc1ac9741551188479e375ec45f8a4acbe97",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_988230914",
+        "mt_733561793",
+        "mt_466888669",
+        "mt_153766707",
+        "mt_465188175"
+      ]
+    },
+    {
+      "number": 49,
+      "path": "data/t3/2026-11-21/batch-0049.json",
+      "size_bytes": 302816,
+      "sha256": "f3c0da791f6c8091746bc1792e158601bf858a7e65ab765395b8f41da77936d6",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_467001229",
+        "mt_512883939",
+        "mt_739440603",
+        "mt_378662415",
+        "mt_895336752"
+      ]
+    },
+    {
+      "number": 50,
+      "path": "data/t3/2026-11-21/batch-0050.json",
+      "size_bytes": 299097,
+      "sha256": "16d0efe33e3c3211669be1ef5453f80ecfbed82776a6f1e65340a1806765d495",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_981774388",
+        "mt_981001098",
+        "mt_377263468",
+        "mt_468448994",
+        "mt_514554663"
+      ]
+    },
+    {
+      "number": 51,
+      "path": "data/t3/2026-11-21/batch-0051.json",
+      "size_bytes": 379994,
+      "sha256": "532204222b1fb346ba81e7a88675db1a2c78a1f3aa0d5f340cfdee04f1cdba0f",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_156116445",
+        "mt_512114261",
+        "mt_739335377",
+        "mt_206007082",
+        "mt_378771634"
+      ]
+    },
+    {
+      "number": 52,
+      "path": "data/t3/2026-11-21/batch-0052.json",
+      "size_bytes": 292900,
+      "sha256": "3fb40f4482e8e37ca030be51470b05beb07d1a2ed6fdc51ec981926c5c9f15bf",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_643449253",
+        "mt_739339527",
+        "mt_896247928",
+        "mt_372504754",
+        "mt_645810485"
+      ]
+    },
+    {
+      "number": 53,
+      "path": "data/t3/2026-11-21/batch-0053.json",
+      "size_bytes": 194888,
+      "sha256": "a570f9f77ea589117e2224b749c4e17c6f19e4f9a7c914daaa039c557ceac0b4",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_461952698",
+        "mt_029785274",
+        "mt_513679161",
+        "mt_208391039",
+        "mt_735022773"
+      ]
+    },
+    {
+      "number": 54,
+      "path": "data/t3/2026-11-21/batch-0054.json",
+      "size_bytes": 174866,
+      "sha256": "73e324d068f8ed304e5268c0535b9f8a9f9f9da3af68a1e6d839ba6210295972",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_890644883",
+        "mt_371200330",
+        "mt_649511668",
+        "mt_643034985",
+        "mt_739619241"
+      ]
+    },
+    {
+      "number": 55,
+      "path": "data/t3/2026-11-21/batch-0055.json",
+      "size_bytes": 305600,
+      "sha256": "d881511dc9d00f428b9546d2b863b2c15250bb417d567e3b854d9508b72d0887",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_467297558",
+        "mt_981123976",
+        "mt_378814301",
+        "mt_467782490",
+        "mt_024435507"
+      ]
+    },
+    {
+      "number": 56,
+      "path": "data/t3/2026-11-21/batch-0056.json",
+      "size_bytes": 382945,
+      "sha256": "5a6a1885a93fc45bb622aadebf1c52fb5de3d582e45870d523c71ee6991f6b20",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_206671118",
+        "mt_643403933",
+        "mt_512681354",
+        "mt_512671386",
+        "mt_206390703"
+      ]
+    },
+    {
+      "number": 57,
+      "path": "data/t3/2026-11-21/batch-0057.json",
+      "size_bytes": 383570,
+      "sha256": "62624916fc598b28f838e1bed14352c25bfd0bda8b88fcf4f06ad089628ec4d1",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_200231682",
+        "mt_466496166",
+        "mt_899774867",
+        "mt_511922148",
+        "mt_200860888"
+      ]
+    },
+    {
+      "number": 58,
+      "path": "data/t3/2026-11-21/batch-0058.json",
+      "size_bytes": 328468,
+      "sha256": "b92d31b39c98bb7c753d81e2e71c86ba0725bb1a690cafba45537aa4c0ed9266",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_644548186",
+        "mt_732091161",
+        "mt_890808398",
+        "mt_735526755",
+        "mt_982829422"
+      ]
+    },
+    {
+      "number": 59,
+      "path": "data/t3/2026-11-21/batch-0059.json",
+      "size_bytes": 362686,
+      "sha256": "a85acd074e67dcf742aee2ffabcb0f0fa5c36b9b2499b59febdfc160c95c16c4",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_468684172",
+        "mt_981849107",
+        "mt_377132283",
+        "mt_156638106",
+        "mt_895469357"
+      ]
+    },
+    {
+      "number": 60,
+      "path": "data/t3/2026-11-21/batch-0060.json",
+      "size_bytes": 330001,
+      "sha256": "284dd1f0dad3498bdfbc7f1495b7924f7e363d0a42d2e99408277af2b34d7ab7",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_467969599",
+        "mt_024727700",
+        "mt_466219515",
+        "mt_733601259",
+        "mt_899708536"
+      ]
+    },
+    {
+      "number": 61,
+      "path": "data/t3/2026-11-21/batch-0061.json",
+      "size_bytes": 393336,
+      "sha256": "ebd9787ec355d36f65a07750d330dfeab0d3a9f6b9b9e1f11b0aff769b946ab1",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_899708540",
+        "mt_466286911",
+        "mt_511941632",
+        "mt_988328048",
+        "mt_644032839"
+      ]
+    },
+    {
+      "number": 62,
+      "path": "data/t3/2026-11-21/batch-0062.json",
+      "size_bytes": 354937,
+      "sha256": "211d05e64e0e65aaa4db06168f67215b1128e27c86f25cae74de0f9c876d7398",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_155803011",
+        "mt_899754586",
+        "mt_200193867",
+        "mt_022927879",
+        "mt_467276898"
+      ]
+    },
+    {
+      "number": 63,
+      "path": "data/t3/2026-11-21/batch-0063.json",
+      "size_bytes": 258031,
+      "sha256": "20c73a5012e0874fef3b42ad19029121be9c8ad07a3168690afc75ed32d2efee",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_377414365",
+        "mt_156184504",
+        "mt_890868853",
+        "mt_156194848",
+        "mt_468155424"
+      ]
+    },
+    {
+      "number": 64,
+      "path": "data/t3/2026-11-21/batch-0064.json",
+      "size_bytes": 198658,
+      "sha256": "14b75fa231d45421e46902fbc8f32f8f296832c2a8e1b2d8f9defee0dcb7fd83",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_023988055",
+        "mt_514377593",
+        "mt_982069883",
+        "mt_024379182",
+        "mt_512463878"
+      ]
+    },
+    {
+      "number": 65,
+      "path": "data/t3/2026-11-21/batch-0065.json",
+      "size_bytes": 374520,
+      "sha256": "25cf34b05d1836487ea1a77d0df1df38902b5df5a579ea61294834cdcac256c4",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_739947936",
+        "mt_733735029",
+        "mt_899832087",
+        "mt_644628903",
+        "mt_899832060"
+      ]
+    },
+    {
+      "number": 66,
+      "path": "data/t3/2026-11-21/batch-0066.json",
+      "size_bytes": 364104,
+      "sha256": "347fb060c5a8641e7cccb980629f95bcbaa767b4dbbd526d38a6300250d08dd0",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_899659675",
+        "mt_514122619",
+        "mt_024112140",
+        "mt_643154239",
+        "mt_023909350"
+      ]
+    },
+    {
+      "number": 67,
+      "path": "data/t3/2026-11-21/batch-0067.json",
+      "size_bytes": 159106,
+      "sha256": "04f4bb3f7461ac638555652ca92fa2e77b1ff28d2f9fdb3200b11ad27db233d9",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_982466932",
+        "mt_207899216",
+        "mt_156733185",
+        "mt_735022764",
+        "mt_512949893"
+      ]
+    },
+    {
+      "number": 68,
+      "path": "data/t3/2026-11-21/batch-0068.json",
+      "size_bytes": 313017,
+      "sha256": "4d477fb314984fa0abeff24fba5e598ee9ae3c810791a9f979872e735fee22f6",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_981323732",
+        "mt_467516077",
+        "mt_155816567",
+        "mt_899780905",
+        "mt_981301678"
+      ]
+    },
+    {
+      "number": 69,
+      "path": "data/t3/2026-11-21/batch-0069.json",
+      "size_bytes": 315034,
+      "sha256": "c2646c349442a9cf2d5df00ad28b3d615d9fef948437a437cb69c97c92885707",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_206550372",
+        "mt_206350136",
+        "mt_467906142",
+        "mt_024782918",
+        "mt_371200345"
+      ]
+    },
+    {
+      "number": 70,
+      "path": "data/t3/2026-11-21/batch-0070.json",
+      "size_bytes": 148513,
+      "sha256": "deebb94fdebde2bb268724d7fadbeeec6e7eac52b961a3ee649c38e7d8efed2f",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_649511656",
+        "mt_468155412",
+        "mt_023988099",
+        "mt_514377534",
+        "mt_207899280"
+      ]
+    },
+    {
+      "number": 71,
+      "path": "data/t3/2026-11-21/batch-0071.json",
+      "size_bytes": 178871,
+      "sha256": "659cc2518af774d835feaa23c82b136e3f04f470d9ea017899d7eb6eb720d62f",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_156733179",
+        "mt_735022702",
+        "mt_890644862",
+        "mt_378863882",
+        "mt_150091051"
+      ]
+    },
+    {
+      "number": 72,
+      "path": "data/t3/2026-11-21/batch-0072.json",
+      "size_bytes": 229223,
+      "sha256": "5dd1cb9b5b44b12b6ecd81bc76e65ae9ccd8041e5d12d1c537bf15fa3a6e9f76",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_512168747",
+        "mt_511949574",
+        "mt_371200313",
+        "mt_895538596",
+        "mt_467684162"
+      ]
+    },
+    {
+      "number": 73,
+      "path": "data/t3/2026-11-21/batch-0073.json",
+      "size_bytes": 320204,
+      "sha256": "89b76c4e98850543cf4340a354746c80681ad24a4e8439d1f5904044bab2fbb6",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_739443106",
+        "mt_895339266",
+        "mt_378667521",
+        "mt_643224853",
+        "mt_024112791"
+      ]
+    },
+    {
+      "number": 74,
+      "path": "data/t3/2026-11-21/batch-0074.json",
+      "size_bytes": 349042,
+      "sha256": "32c19431f6583a0ee0adc0d0126b77c5eb6891cee5627005af7c0e85379f52ae",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_981778040",
+        "mt_739222057",
+        "mt_895026326",
+        "mt_150647318",
+        "mt_468140252"
+      ]
+    },
+    {
+      "number": 75,
+      "path": "data/t3/2026-11-21/batch-0075.json",
+      "size_bytes": 334631,
+      "sha256": "26db4a41e8230e9babc202774e2eb5e257e5fc7fb214fcd76778552c44216b01",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_023901589",
+        "mt_511361176",
+        "mt_209211009",
+        "mt_377244071",
+        "mt_984072643"
+      ]
+    },
+    {
+      "number": 76,
+      "path": "data/t3/2026-11-21/batch-0076.json",
+      "size_bytes": 404738,
+      "sha256": "cab89fe72265ab5679163d4f64b490d6f23731b5638c9dc6c689e42d6cbdf9fa",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_895444607",
+        "mt_155788398",
+        "mt_988444324",
+        "mt_200809997",
+        "mt_649562031"
+      ]
+    },
+    {
+      "number": 77,
+      "path": "data/t3/2026-11-21/batch-0077.json",
+      "size_bytes": 309403,
+      "sha256": "4d4a38e49905372539f810bbe302cb2dcd242214a696bdf643ee0f400d44482c",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_649562048",
+        "mt_206136955",
+        "mt_988439034",
+        "mt_200812317",
+        "mt_155781480"
+      ]
+    },
+    {
+      "number": 78,
+      "path": "data/t3/2026-11-21/batch-0078.json",
+      "size_bytes": 327497,
+      "sha256": "40f40dfc3dfa546f46fa8e6f7a19abe2358c3577b5f4b7161163259bb2a4eb05",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_733067163",
+        "mt_644506808",
+        "mt_022950795",
+        "mt_511395633",
+        "mt_466122852"
+      ]
+    },
+    {
+      "number": 79,
+      "path": "data/t3/2026-11-21/batch-0079.json",
+      "size_bytes": 340085,
+      "sha256": "85b5449bb04869559e6f35113ec5f723aa176adc318766e8c459f8d9180f5eb6",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_022955389",
+        "mt_511399474",
+        "mt_200811790",
+        "mt_155788639",
+        "mt_733066522"
+      ]
+    },
+    {
+      "number": 80,
+      "path": "data/t3/2026-11-21/batch-0080.json",
+      "size_bytes": 365844,
+      "sha256": "b880016aa6447d6e1de4ae7853f255ac7183e65da31915c43d288149963b3bf3",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_899677042",
+        "mt_377244153",
+        "mt_466122891",
+        "mt_899677496",
+        "mt_988433680"
+      ]
+    },
+    {
+      "number": 81,
+      "path": "data/t3/2026-11-21/batch-0081.json",
+      "size_bytes": 377722,
+      "sha256": "2f43b98568d4a47515dd69f44b697e715739bde9b017e8b2e48d3c512d631d0a",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_200811952",
+        "mt_733000653",
+        "mt_986933887",
+        "mt_153188554",
+        "mt_643111599"
+      ]
+    },
+    {
+      "number": 82,
+      "path": "data/t3/2026-11-21/batch-0082.json",
+      "size_bytes": 336856,
+      "sha256": "5acbc3e8b0de536e8c7c4e9ca14f5c313df0b423c2bc8f06f3f750560e4dd181",
+      "fixture_count": 5,
+      "fixture_ids": [
+        "mt_644541121",
+        "mt_730194603",
+        "mt_895708485",
+        "mt_988486664",
+        "mt_643096162"
+      ]
+    }
+  ]
+}

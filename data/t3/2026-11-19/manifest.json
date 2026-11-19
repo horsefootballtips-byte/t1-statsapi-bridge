@@ -6,13 +6,13 @@
   "source_schema": "T5_STATSAPI_GITHUB_SNAPSHOT_V4",
   "source_snapshot": {
     "path": "data/2026-11-19.json",
-    "size_bytes": 3140204,
-    "sha256": "5c71695bb068626c1eaed33230edfec04b3c59cb3936fb6ff2ea7db8846b8c2f"
+    "size_bytes": 3603169,
+    "sha256": "a43477463256a2f1a96d40637afc0a570c1c73366dd0b4257a7f215384ab8146"
   },
-  "source_fixtures": 34,
-  "source_enriched": 34,
-  "published_fixtures": 34,
-  "fixture_count": 34,
+  "source_fixtures": 35,
+  "source_enriched": 35,
+  "published_fixtures": 35,
+  "fixture_count": 35,
   "batch_count": 7,
   "max_batch_bytes": 420000,
   "player_evidence": {
@@ -25,8 +25,8 @@
     {
       "number": 1,
       "path": "data/t3/2026-11-19/batch-0001.json",
-      "size_bytes": 392330,
-      "sha256": "99ab5c56cf4a4726a8f3341eedf484ebdb41cc0548d6b088be8bfd6f40ffe8d6",
+      "size_bytes": 392331,
+      "sha256": "624a8646780c12c65ab63e1169ed352a23cd960a2ca5f9d1f1557a33bb6dfe8b",
       "fixture_count": 5,
       "fixture_ids": [
         "mt_153740158",
@@ -39,80 +39,81 @@
     {
       "number": 2,
       "path": "data/t3/2026-11-19/batch-0002.json",
-      "size_bytes": 330251,
-      "sha256": "904f9e0164c52c203003f4b6e96301519afa95c0100ef401ddc17cc3c66be13b",
+      "size_bytes": 323955,
+      "sha256": "19b9bf5c6d235fc273c3ba69c54777a78be1a15036118e90859a624d94f39a51",
       "fixture_count": 5,
       "fixture_ids": [
+        "mt_981774322",
         "mt_896262790",
         "mt_645858044",
         "mt_513636916",
-        "mt_982804461",
-        "mt_029728705"
+        "mt_982804461"
       ]
     },
     {
       "number": 3,
       "path": "data/t3/2026-11-19/batch-0003.json",
-      "size_bytes": 329944,
-      "sha256": "84494262429aeb20436310ea976999087e8cbf8a3c32eaeed67b0cbe1509210b",
+      "size_bytes": 318867,
+      "sha256": "d243fa1d4919c6266fbe55ec7401ffceea3238cab475cb6b308bb3c10de5d657",
       "fixture_count": 5,
       "fixture_ids": [
+        "mt_029728705",
         "mt_730132174",
         "mt_513617694",
         "mt_208309310",
-        "mt_372570523",
-        "mt_200803930"
+        "mt_372570523"
       ]
     },
     {
       "number": 4,
       "path": "data/t3/2026-11-19/batch-0004.json",
-      "size_bytes": 318410,
-      "sha256": "a97dfbcf3fc408ef777797bba7602c9d451d5859f52d7d87de714302f14a4e35",
+      "size_bytes": 346309,
+      "sha256": "551002ae863685b0b25c2235a4a1db15f91a85560b11d5c566eedd49a0400aa3",
       "fixture_count": 5,
       "fixture_ids": [
+        "mt_200803930",
         "mt_371503571",
         "mt_649816843",
         "mt_023282240",
-        "mt_890926642",
-        "mt_896228257"
+        "mt_890926642"
       ]
     },
     {
       "number": 5,
       "path": "data/t3/2026-11-19/batch-0005.json",
-      "size_bytes": 296477,
-      "sha256": "2e1382a69ec06b5bd2f099d4dd2173aefe258cd0cbca1dd661da9ac729f5307b",
+      "size_bytes": 315993,
+      "sha256": "5413c7a22ca09d2601f40110edccf2af5f9ff4b609f7033e054841b0014ede64",
       "fixture_count": 5,
       "fixture_ids": [
+        "mt_896228257",
         "mt_649508321",
         "mt_982829411",
         "mt_735757452",
-        "mt_982929721",
-        "mt_649696230"
+        "mt_982929721"
       ]
     },
     {
       "number": 6,
       "path": "data/t3/2026-11-19/batch-0006.json",
-      "size_bytes": 313602,
-      "sha256": "25d2c93a4526d48198fafba0c679352d0e686c0e76f9c56358e10dd80b3232d8",
+      "size_bytes": 306588,
+      "sha256": "f2a60fbf5d4c4e497ef1698a29280277b2bc06ce0fb48f3dffb7f199521da2aa",
       "fixture_count": 5,
       "fixture_ids": [
+        "mt_649696230",
         "mt_156561709",
         "mt_895343552",
         "mt_378606873",
-        "mt_643212340",
-        "mt_467050761"
+        "mt_643212340"
       ]
     },
     {
       "number": 7,
       "path": "data/t3/2026-11-19/batch-0007.json",
-      "size_bytes": 268944,
-      "sha256": "8dbc4904cf7f63d0f9df9b7785ff30df333a323c15aef4b374b0d8ab379c0e44",
-      "fixture_count": 4,
+      "size_bytes": 333115,
+      "sha256": "0924ffd6f251444755eb4b71e012e6f1ad20c7a685fd3e5bdf34319e914b8871",
+      "fixture_count": 5,
       "fixture_ids": [
+        "mt_467050761",
         "mt_512878212",
         "mt_207880609",
         "mt_517362527",
