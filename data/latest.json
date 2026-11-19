@@ -1,62 +1,14 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-11-19T03:26:13.856Z",
-  "base_operating_date": "2026-11-19",
+  "generated_at_utc": "2026-11-19T03:52:04.490Z",
+  "base_operating_date": "2026-11-21",
   "state": "CONTINUATION_REQUIRED",
   "outputs": [
-    {
-      "operating_date": "2026-11-19",
-      "filename": "data/2026-11-19.json",
-      "fixture_count": 35,
-      "enriched_count": 35,
-      "state": "COMPLETE",
-      "validation": {
-        "schema_ok": true,
-        "operating_date_ok": true,
-        "snapshot_state_ok": true,
-        "expected_fixture_count": 35,
-        "actual_fixture_count": 35,
-        "expected_enriched_count": 35,
-        "actual_enriched_count": 35,
-        "incomplete_enriched_count": 0,
-        "unique_fixture_count": 35,
-        "unique_enriched_count": 35,
-        "missing_team_count": 0,
-        "orphan_enriched_count": 0,
-        "byte_size": 3603169,
-        "sha256": "a43477463256a2f1a96d40637afc0a570c1c73366dd0b4257a7f215384ab8146",
-        "state": "VALIDATED"
-      }
-    },
-    {
-      "operating_date": "2026-11-20",
-      "filename": "data/2026-11-20.json",
-      "fixture_count": 127,
-      "enriched_count": 127,
-      "state": "COMPLETE",
-      "validation": {
-        "schema_ok": true,
-        "operating_date_ok": true,
-        "snapshot_state_ok": true,
-        "expected_fixture_count": 127,
-        "actual_fixture_count": 127,
-        "expected_enriched_count": 127,
-        "actual_enriched_count": 127,
-        "incomplete_enriched_count": 0,
-        "unique_fixture_count": 127,
-        "unique_enriched_count": 127,
-        "missing_team_count": 0,
-        "orphan_enriched_count": 0,
-        "byte_size": 12569943,
-        "sha256": "1463ef4b609a4239b85f28a8f16fd69c7d8e5426e89002bab6f2e719592a183e",
-        "state": "VALIDATED"
-      }
-    },
     {
       "operating_date": "2026-11-21",
       "filename": "data/2026-11-21.checkpoint.json",
       "fixture_count": 410,
-      "enriched_count": 48,
+      "enriched_count": 268,
       "state": "CONTINUATION_REQUIRED"
     }
   ]
