@@ -1,38 +1,38 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-11-19T04:18:07.172Z",
-  "base_operating_date": "2026-11-21",
+  "generated_at_utc": "2026-11-19T04:44:07.081Z",
+  "base_operating_date": "2026-11-22",
   "state": "CONTINUATION_REQUIRED",
   "outputs": [
     {
-      "operating_date": "2026-11-21",
-      "filename": "data/2026-11-21.json",
-      "fixture_count": 410,
-      "enriched_count": 410,
+      "operating_date": "2026-11-22",
+      "filename": "data/2026-11-22.json",
+      "fixture_count": 229,
+      "enriched_count": 229,
       "state": "COMPLETE",
       "validation": {
         "schema_ok": true,
         "operating_date_ok": true,
         "snapshot_state_ok": true,
-        "expected_fixture_count": 410,
-        "actual_fixture_count": 410,
-        "expected_enriched_count": 410,
-        "actual_enriched_count": 410,
+        "expected_fixture_count": 229,
+        "actual_fixture_count": 229,
+        "expected_enriched_count": 229,
+        "actual_enriched_count": 229,
         "incomplete_enriched_count": 0,
-        "unique_fixture_count": 410,
-        "unique_enriched_count": 410,
+        "unique_fixture_count": 229,
+        "unique_enriched_count": 229,
         "missing_team_count": 0,
         "orphan_enriched_count": 0,
-        "byte_size": 34461161,
-        "sha256": "585548f6b4bf81b09f0912592df09608be29b838f8e2382114c8d5a1c0ba4207",
+        "byte_size": 19672129,
+        "sha256": "85122ce2d821def48f40ae51690cdc6aa0ba9463e509321b91f42a11cf3c215d",
         "state": "VALIDATED"
       }
     },
     {
-      "operating_date": "2026-11-22",
-      "filename": "data/2026-11-22.checkpoint.json",
-      "fixture_count": 230,
-      "enriched_count": 72,
+      "operating_date": "2026-11-23",
+      "filename": "data/2026-11-23.checkpoint.json",
+      "fixture_count": 57,
+      "enriched_count": 44,
       "state": "CONTINUATION_REQUIRED"
     }
   ]
