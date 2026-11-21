@@ -931,8 +931,14 @@ async function main() {
 
   const outputIndex = [];
   let continuationRequired = false;
+  let quotaPaused = false;
 
   for (const date of dates) {
+    if (monthlyQuotaExhausted) {
+      quotaPaused = true;
+      console.warn("Monthly TheStatsAPI allowance exhausted; no more paid requests this pass.");
+      break;
+    }
     const existingFilename =
       `data/${date}.json`;
 
@@ -1086,6 +1092,24 @@ async function main() {
         continue;
       }
       const plan = planFixtureRefresh(existingFinal, discoveredFixtures);
+      if (plan.reason !== "IDENTICAL" && plan.reason !== "CHANGED_FIXTURE_IDENTITIES") {
+        // A source schema mismatch is NOT permission to spend thousands of
+        // credits repeating every historic match. Preserve the last validated
+        // snapshot and flag it for review, without silently trusting malformed
+        // new fixture evidence.
+        console.error("T5 incremental manifest safety hold for "+date+": "+plan.reason);
+        outputIndex.push({
+          operating_date: date,
+          filename: existingFilename,
+          fixture_count: existingFinal.fixtures.length,
+          enriched_count: existingFinal.enriched_fixtures.length,
+          state: "COMPLETE",
+          source_reuse: "SAFETY_HOLD_"+plan.reason,
+          validation: existingValidation
+        });
+        diagnostics.validated_snapshots_reused++;
+        continue;
+      }
       if (plan.identical) {
         outputIndex.push({
           operating_date: date,
@@ -1137,7 +1161,11 @@ async function main() {
       );
 
     if (!result.complete) {
-      continuationRequired = true;
+      // A true monthly 429 must not recursively dispatch GitHub Actions.
+      // Keep the durable checkpoint; the normal daily schedule can resume
+      // enrichment after the account's reset or a deliberate top-up.
+      quotaPaused = monthlyQuotaExhausted;
+      continuationRequired = !quotaPaused;
 
       outputIndex.push({
         operating_date: date,
@@ -1152,9 +1180,9 @@ async function main() {
           result.enriched_count,
 
         state:
-          "CONTINUATION_REQUIRED"
+          quotaPaused ? "QUOTA_PAUSED" : "CONTINUATION_REQUIRED"
       });
-
+      if (quotaPaused) console.warn("T5 paused incomplete checkpoint until monthly quota recovers: "+date);
       break;
     }
 
@@ -1267,9 +1295,8 @@ async function main() {
           baseDate,
 
         state:
-          continuationRequired
-            ? "CONTINUATION_REQUIRED"
-            : "COMPLETE",
+          quotaPaused ? "QUOTA_PAUSED" :
+          continuationRequired ? "CONTINUATION_REQUIRED" : "COMPLETE",
 
         outputs:
           outputIndex
@@ -1288,6 +1315,7 @@ async function main() {
 
         continuation_required:
           continuationRequired,
+        quota_paused: quotaPaused,
 
         outputs:
           outputIndex,
