@@ -28,6 +28,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify offline result caching and quota protection
+        run: node --test results_collector.test.mjs
       - name: Collect completed-match scores from subscribed TheStatsAPI
         env:
           STATS_API_KEY: ${{ secrets.STATS_API_KEY }}
