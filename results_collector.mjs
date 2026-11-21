@@ -26,7 +26,7 @@ try{
  const saved=JSON.parse(await readFile("data/results/latest.json","utf8"));
  if(saved?.schema!=="MATCHCRAFT_STATSAPI_FINISHED_SCORES_V1"||
   saved?.scope!==15||!Array.isArray(saved?.matches)||
-  typeof saved?.from!=="string"||!/^20\\d{2}-\\d{2}-\\d{2}$/.test(saved.from)||
+  typeof saved?.from!=="string"||!/^20\d{2}-\d{2}-\d{2}$/.test(saved.from)||
   !/^[a-f0-9]{64}$/i.test(saved.recordsSha256||"")||
   sha(JSON.stringify(saved.matches))!==saved.recordsSha256)
   throw Error("Previously saved result snapshot is malformed; refusing unsafe merge");
