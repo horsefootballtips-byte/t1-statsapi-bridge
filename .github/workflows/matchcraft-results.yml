@@ -1,10 +1,5 @@
 name: Matchcraft verified football results
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'results_collector.mjs'
-      - '.github/workflows/matchcraft-results.yml'
   workflow_dispatch:
     inputs:
       backfill:
