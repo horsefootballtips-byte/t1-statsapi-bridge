@@ -769,7 +769,7 @@ async function collectDate(date, competitions, discoveredFixtures = null, priorF
     );
 
   const BATCH_SIZE = 4;
-  diagnostics.newly_enriched_fixtures += remaining.length;
+  // Count successful new enrichments below, not planned work that may time out.
 
   console.log(
     `Resume ${date}: ` +
@@ -822,6 +822,7 @@ async function collectDate(date, competitions, discoveredFixtures = null, priorF
         )
       );
 
+    diagnostics.newly_enriched_fixtures += results.filter(row => row?.state === "COMPLETE").length;
     enriched.push(...results);
 
     for (const row of results) {
@@ -1074,6 +1075,7 @@ async function main() {
         // Existing validated data remains usable during a provider outage
         // or the end-of-month quota lock. Never invent missing new fixtures.
         if (monthlyQuotaExhausted) {
+          quotaPaused = true;
           manifestUnavailable = true;
           console.warn("T5 provider monthly quota exhausted: keeping last validated snapshot "+date);
         } else throw error;
