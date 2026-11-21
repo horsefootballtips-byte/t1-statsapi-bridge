@@ -6,6 +6,12 @@ on:
       - 'results_collector.mjs'
       - '.github/workflows/matchcraft-results.yml'
   workflow_dispatch:
+    inputs:
+      backfill:
+        description: "EXTRA CREDIT SPEND: collect every result since Aug 2026? Leave OFF for ordinary results refresh."
+        required: false
+        type: boolean
+        default: false
   schedule:
     - cron: '40 20 * * *'
     - cron: '30 2 * * *'
@@ -30,7 +36,7 @@ jobs:
       - name: Collect completed-match scores from subscribed TheStatsAPI
         env:
           STATS_API_KEY: ${{ secrets.STATS_API_KEY }}
-          BACKFILL: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && '1' || '0' }}
+          BACKFILL: ${{ github.event_name == 'workflow_dispatch' && inputs.backfill == true && '1' || '0' }}
         run: node results_collector.mjs
       - name: Publish validated score snapshots
         run: |
