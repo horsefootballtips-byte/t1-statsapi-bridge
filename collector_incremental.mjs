@@ -13,7 +13,7 @@ export function matchCoreKey(match) {
   const season = match.season_id || match.season?.id || "";
   const status = String(match.status || "").toLowerCase();
   const disruption = /postpon|cancel|abandon|suspend/.test(status) ? "DISRUPTED" : "ACTIVE";
-  if (!team("home") || !team("away") || !kickoff || !competition || !season) return null;
+  if (!team("home") || !team("away") || !kickoff || !competition) return null;
   // Availability/odds, scores, in-play status and volatile metadata are
   // intentionally excluded; targeted odds and XI checks own their refresh.
   return JSON.stringify([
