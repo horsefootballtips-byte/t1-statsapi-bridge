@@ -1,6 +1,7 @@
 import { mkdir, writeFile, readFile, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { createPlayerCollector } from "./player_enrichment.mjs";
+import { canReuseFinishedEnrichment, planFixtureRefresh } from "./collector_incremental.mjs";
 const API_BASE = "https://api.thestatsapi.com/api/football";
 const API_KEY = process.env.STATS_API_KEY;
 const TIMEZONE = "Europe/London";
@@ -33,6 +34,10 @@ const diagnostics = {
   cache_hits: 0,
   cache_misses: 0,
   duplicate_requests_avoided: 0,
+  validated_snapshots_reused: 0,
+  preserved_historical_enrichments: 0,
+  newly_enriched_fixtures: 0,
+  cheap_fixture_manifest_checks: 0,
   // Request headers only: no extra API calls and no account credentials stored.
   api_quota_last_seen: null,
   errors: []
@@ -677,8 +682,9 @@ async function saveCheckpoint(
   return filename;
 }
 
-async function collectDate(date, competitions) {
-  const fixtures = await fetchAll("/matches", {
+async function collectDate(date, competitions, discoveredFixtures = null, priorFinal = null) {
+  // A prior cheap manifest check is already paid for: never fetch it twice.
+  const fixtures = discoveredFixtures ?? await fetchAll("/matches", {
     date_from: date,
     date_to: date
   });
@@ -726,29 +732,25 @@ async function collectDate(date, competitions) {
   const checkpoint =
     await readJsonIfExists(checkpointFile);
 
-  // A prior-day COMPLETE checkpoint is not fresh evidence. Re-enrich
-  // from today\'s source discovery; incomplete checkpoints remain
-  // resumable across midnight and are never discarded.
-  const previous = checkpoint?.state === "COMPLETE" &&
-    checkpoint?.generated_at_utc?.slice(0, 10) !== londonDate()
-      ? null
-      : checkpoint;
-
-  const fixtureIds = new Set(
-    fixtures
-      .map(row => String(row?.id || ""))
-      .filter(Boolean)
-  );
-
-  const enriched =
-    Array.isArray(previous?.enriched_fixtures)
-      ? previous.enriched_fixtures.filter(row =>
-          row?.state === 'COMPLETE' &&
-          fixtureIds.has(
-            String(row?.match?.id || "")
-          )
-        )
-      : [];
+  // Persisted COMPLETE rows are valid across process runs and calendar
+  // days. Only re-enrich a fixture whose material identity actually changed.
+  // Previous checkpoints may also contain genuinely completed partial work.
+  // Every reused row is checked against its current dated fixture manifest.
+  const completedHistory = new Map();
+  for (const row of [
+    ...(Array.isArray(checkpoint?.enriched_fixtures) ? checkpoint.enriched_fixtures : []),
+    ...(Array.isArray(priorFinal?.enriched_fixtures) ? priorFinal.enriched_fixtures : [])
+  ]) {
+    const id = String(row?.match?.id || "");
+    if (id && row?.state === "COMPLETE" && !completedHistory.has(id))
+      completedHistory.set(id, row);
+  }
+  const enriched = fixtures.flatMap(match => {
+    const oldRow = completedHistory.get(String(match?.id || ""));
+    return canReuseFinishedEnrichment(oldRow, match)
+      ? [{...oldRow, match}] : [];
+  });
+  diagnostics.preserved_historical_enrichments += enriched.length;
 
   const completed = new Set(
     enriched
@@ -767,6 +769,7 @@ async function collectDate(date, competitions) {
     );
 
   const BATCH_SIZE = 4;
+  diagnostics.newly_enriched_fixtures += remaining.length;
 
   console.log(
     `Resume ${date}: ` +
