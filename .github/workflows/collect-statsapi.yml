@@ -88,6 +88,10 @@ jobs:
           console.log(`event=${event} run=${run}`);
           NODE
 
+      - name: Verify credit-saving refresh policy (offline)
+        if: steps.guard.outputs.run == 'true'
+        run: node --test collector_incremental.test.mjs
+
       - name: Collect football data
         if: steps.guard.outputs.run == 'true'
         env:
