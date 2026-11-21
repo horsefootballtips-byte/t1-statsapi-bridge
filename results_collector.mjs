@@ -16,6 +16,7 @@ const target=[
  ["National League South","comp_0182"]
 ];
 const ukDate=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Europe/London",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+// Explicit owner requested a one-time current-season backfill; recurring runs use a 7-day window.
 const backfill=process.env.BACKFILL==="1";
 const to=ukDate(),from=backfill?"2026-08-01":new Date(Date.now()-7*86400000).toISOString().slice(0,10);
 const sha=s=>createHash("sha256").update(s).digest("hex");
