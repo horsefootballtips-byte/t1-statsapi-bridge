@@ -1042,6 +1042,71 @@ async function main() {
       continue;
     }
 
+    // A rolling 3-day calendar is not an instruction to re-download every
+    // completed historic match for the same Saturday on Thursday, Friday
+    // and Saturday. Recheck only the cheap fixture manifest for old COMPLETE
+    // days, then reuse immutable history for unchanged fixtures.
+    let discoveredFixtures = null;
+    let oldSnapshotValid = false;
+    if (existingFinal?.state === "COMPLETE" &&
+        existingFinal?.schema === "T5_STATSAPI_GITHUB_SNAPSHOT_V4") {
+      const existingValidation = await validateFinalSnapshot(
+        existingFilename,
+        date,
+        existingFinal.fixtures?.length || 0,
+        existingFinal.enriched_fixtures?.length || 0
+      );
+      oldSnapshotValid = existingValidation.state === "VALIDATED";
+      let manifestUnavailable = false;
+      try {
+        discoveredFixtures = await fetchAll("/matches", {
+          date_from: date,
+          date_to: date
+        });
+        diagnostics.cheap_fixture_manifest_checks++;
+      } catch (error) {
+        // Existing validated data remains usable during a provider outage
+        // or the end-of-month quota lock. Never invent missing new fixtures.
+        if (monthlyQuotaExhausted) {
+          manifestUnavailable = true;
+          console.warn("T5 provider monthly quota exhausted: keeping last validated snapshot "+date);
+        } else throw error;
+      }
+      if (manifestUnavailable) {
+        outputIndex.push({
+          operating_date: date,
+          filename: existingFilename,
+          fixture_count: existingFinal.fixtures.length,
+          enriched_count: existingFinal.enriched_fixtures.length,
+          state: "COMPLETE",
+          source_reuse: "MONTHLY_QUOTA_FALLBACK_NO_FRESH_MANIFEST",
+          validation: existingValidation
+        });
+        diagnostics.validated_snapshots_reused++;
+        continue;
+      }
+      const plan = planFixtureRefresh(existingFinal, discoveredFixtures);
+      if (plan.identical) {
+        outputIndex.push({
+          operating_date: date,
+          filename: existingFilename,
+          fixture_count: existingFinal.fixtures.length,
+          enriched_count: existingFinal.enriched_fixtures.length,
+          state: "COMPLETE",
+          source_reuse: "UNCHANGED_MATERIAL_FIXTURE_IDENTITIES",
+          validation: existingValidation
+        });
+        diagnostics.validated_snapshots_reused++;
+        diagnostics.preserved_historical_enrichments += plan.reusedCount;
+        console.log("Reused previous T5 "+date+" validated snapshot: "+
+          plan.reusedCount+" fixture histories preserved; only fixture manifest checked");
+        continue;
+      }
+      console.log("Incremental T5 "+date+": "+(plan.changedIds?.length||0)+
+        " changed/added fixtures; "+(plan.removedIds?.length||0)+
+        " removed; "+(plan.reusedCount||0)+" preserved");
+    }
+
     console.log(
       `Collecting StatsAPI data for ${date}`
     );
@@ -1054,12 +1119,21 @@ async function main() {
     const previousSourceSha = existingFinal?.state === "COMPLETE"
       ? createHash("sha256").update(await readFile(existingFilename)).digest("hex")
       : null;
-    if (!competitions) competitions = await fetchAll("/competitions");
+    if (!competitions) {
+      // Existing audited competition IDs and names do not expire overnight.
+      // Reuse them unless this date has no trusted snapshot to build from.
+      competitions = oldSnapshotValid &&
+        Array.isArray(existingFinal?.competitions) &&
+        existingFinal.competitions.length > 0
+        ? existingFinal.competitions : await fetchAll("/competitions");
+    }
 
     const result =
       await collectDate(
         date,
-        competitions
+        competitions,
+        discoveredFixtures,
+        oldSnapshotValid ? existingFinal : null
       );
 
     if (!result.complete) {
