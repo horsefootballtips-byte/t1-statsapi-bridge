@@ -33,9 +33,9 @@ The key is used only inside GitHub Actions. Never place it in `collector.mjs`, t
 
 ## Schedule
 
-The workflow uses two UTC cron entries plus a Europe/London time guard so BST/GMT changes do not shift the intended local run. It collects at approximately **21:40 Europe/London**, ahead of the current **22:47 T1** schedule.
+The active GitHub Actions workflow is `.github/workflows/collect-statsapi.yml` (**Collect T5 Football StatsAPI snapshot**). It runs at about **03:00 Europe/London**, with a **05:15 London-time backup** and timezone guard. The root-level `collect-statsapi.yml` is a legacy copy and is not a GitHub Actions workflow.
 
-You can also run it manually from **Actions → Collect T1 StatsAPI snapshot → Run workflow** and optionally supply a date.
+You can start an authorised manual pass from **Actions → Collect T5 Football StatsAPI snapshot → Run workflow**, optionally setting a date. Manual passes can spend provider credits for new or materially changed fixtures; don't launch them merely to re-read the same completed data.
 
 ## Credit-saving verification (21 November 2026)
 
