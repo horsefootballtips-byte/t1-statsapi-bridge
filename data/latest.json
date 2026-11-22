@@ -1,15 +1,33 @@
 {
   "schema": "T5_STATSAPI_GITHUB_INDEX_V5",
-  "generated_at_utc": "2026-11-21T03:17:25.654Z",
-  "base_operating_date": "2026-11-21",
-  "state": "CONTINUATION_REQUIRED",
+  "generated_at_utc": "2026-11-22T08:58:14.734Z",
+  "base_operating_date": "2026-11-22",
+  "state": "QUOTA_PAUSED",
   "outputs": [
     {
-      "operating_date": "2026-11-21",
-      "filename": "data/2026-11-21.checkpoint.json",
-      "fixture_count": 414,
-      "enriched_count": 108,
-      "state": "CONTINUATION_REQUIRED"
+      "operating_date": "2026-11-22",
+      "filename": "data/2026-11-22.json",
+      "fixture_count": 229,
+      "enriched_count": 229,
+      "state": "COMPLETE",
+      "source_reuse": "MONTHLY_QUOTA_FALLBACK_NO_FRESH_MANIFEST",
+      "validation": {
+        "schema_ok": true,
+        "operating_date_ok": true,
+        "snapshot_state_ok": true,
+        "expected_fixture_count": 229,
+        "actual_fixture_count": 229,
+        "expected_enriched_count": 229,
+        "actual_enriched_count": 229,
+        "incomplete_enriched_count": 0,
+        "unique_fixture_count": 229,
+        "unique_enriched_count": 229,
+        "missing_team_count": 0,
+        "orphan_enriched_count": 0,
+        "byte_size": 20263719,
+        "sha256": "3c2efec2b2d035b869f4094415c8ce661a944d33bcc8d7ca28a41bc59af7d579",
+        "state": "VALIDATED"
+      }
     }
   ]
 }
