@@ -1,0 +1,109 @@
+name: RaceIQ historical access diagnostic
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/raceiq-historical-diagnostic.yml'
+permissions:
+  contents: read
+concurrency:
+  group: raceiq-historical-diagnostic
+  cancel-in-progress: false
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ordinary browser
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Check public results for three dates
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, re
+          from playwright.sync_api import sync_playwright
+          from pathlib import Path
+          samples = [
+              "2026-11-26/market-rasen/1339",
+              "2025-11-27/taunton/1450",
+              "2024-11-27/market-rasen/1425",
+          ]
+          endpoints = {"metrics", "comparison", "sectional"}
+          results = []
+          blocked = []
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              context = browser.new_context()
+              for race in samples:
+                  report = {"race": race, "endpoints": {}, "errors": []}
+                  results.append(report)
+                  page = context.new_page()
+                  def on_response(response):
+                      if "racingtv.com" not in response.url:
+                          return
+                      if response.status in (401, 403, 429) and (
+                          "/iq-results/" in response.url or
+                          "/results/" + race in response.url
+                      ):
+                          blocked.append({"race": race, "status": response.status})
+                  def on_finished(request):
+                      response = request.response()
+                      if not response or "/iq-results/" + race + "/" not in response.url:
+                          return
+                      endpoint = response.url.split("?")[0].rstrip("/").split("/")[-1]
+                      if endpoint not in endpoints:
+                          return
+                      info = {"status": response.status}
+                      report["endpoints"][endpoint] = info
+                      if response.status != 200:
+                          return
+                      try:
+                          payload = response.json()
+                          info["json"] = True
+                          runners = payload.get("race", {}).get("runners") if isinstance(payload, dict) else None
+                          if isinstance(runners, list):
+                              info["runner_count"] = len(runners)
+                              if endpoint == "sectional":
+                                  info["sectional_count"] = sum(len(r.get("sectionals") or []) for r in runners if isinstance(r, dict))
+                      except Exception as e:
+                          info["json"] = False
+                          info["error_type"] = type(e).__name__
+                  page.on("response", on_response)
+                  page.on("requestfinished", on_finished)
+                  try:
+                      response = page.goto("https://www.racingtv.com/results/" + race, wait_until="domcontentloaded", timeout=30000)
+                      report["page_status"] = response.status if response else None
+                      page.wait_for_timeout(3000)
+                      for label in [r"accept all cookies", r"raceiq comparison", r"^sectionals$"]:
+                          if blocked:
+                              break
+                          tab = page.get_by_text(re.compile(label, re.I)).first
+                          if tab.is_visible():
+                              tab.click(timeout=5000)
+                              page.wait_for_timeout(3000)
+                  except Exception as e:
+                      report["errors"].append(type(e).__name__)
+                  finally:
+                      page.close()
+                  if blocked:
+                      break
+              context.close()
+              browser.close()
+          summary = {"mode": "limited transient access check", "attempted": len(results), "blocked": blocked, "results": results, "raw_measurements_saved": 0}
+          print(json.dumps(summary, indent=2))
+          with open("raceiq-diagnostic-summary.json", "w", encoding="utf-8") as f:
+              json.dump(summary, f, indent=2)
+          if blocked:
+              print("Access refused; stopped without retry or bypass.")
+          PY
+      - name: Upload diagnostic counts only
+        uses: actions/upload-artifact@v4
+        with:
+          name: raceiq-access-summary
+          path: raceiq-diagnostic-summary.json
+          retention-days: 3
